@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package packagerversion="1.4.2" 
+         version="2.0" 
+         xmlns="http://pear.php.net/dtd/package-2.0" 
+         xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+                             http://pear.php.net/dtd/tasks-1.0.xsd
+                             http://pear.php.net/dtd/package-2.0
+                             http://pear.php.net/dtd/package-2.0.xsd">
+    <name>Services_Twitter</name>
+    <channel>pear.php.net</channel>
+    <summary>PHP interface to Twitter's API</summary>
+    <description>An interface for communicating with Twitter's public API. Send status updates, fetch information, add friends, etc.</description>
+    <lead>
+        <name>Joe Stump</name>
+        <user>jstump</user>
+        <email>joe@joestump.net</email>
+        <active>yes</active>
+    </lead>
+    <lead>
+        <name>David Jean Louis</name>
+        <user>izi</user>
+        <email>izi@php.net</email>
+        <active>yes</active>
+    </lead>
+
+    <date>2008-04-12</date>
+    <version>
+        <release>0.0.1</release>
+        <api>0.0.1</api>
+    </version>
+    <stability>
+        <release>beta</release>
+        <api>beta</api>
+    </stability>
+    <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
+    <notes><![CDATA[
+        * Initial release
+    ]]></notes>
+    <contents>
+        <dir name="/">
+            <dir name="Services">
+                <file name="Twitter.php" role="php">
+                    <tasks:replace from="@version@" to="version" type="package-info" />
+                </file>
+                <dir name="Twitter">
+                    <file name="Account.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />
+                    </file>
+                    <file name="Common.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />                   
+                    </file>
+                    <file name="DirectMessages.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />
+                    </file>
+                    <file name="Exception.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />
+                    </file>
+                    <file name="Favorites.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />
+                    </file>
+                    <file name="Favorites.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />
+                    </file>
+                    <file name="Friendships.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />
+                    </file>
+                    <file name="Notifications.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />
+                    </file>
+                    <file name="Statuses.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />
+                    </file>
+                    <file name="Users.php" role="php">
+                        <tasks:replace from="@version@" 
+                                       to="version" 
+                                       type="package-info" />
+                    </file>
+                </dir>
+            </dir>
+            <dir name="tests">
+                <file name="005-services-twitter-statuses-public-timeline.phpt"
+                      role="test" />
+                <file name="006-services-twitter-statuses-friends-timeline.phpt"
+                      role="test" />
+                <file name="007-services-twitter-statuses-user-timeline.phpt"
+                      role="test" />
+                <file name="010-services-twitter-statuses-show.phpt"
+                      role="test" />
+                <file name="015-services-twitter-statuses-replies.phpt"
+                      role="test" />
+                <file name="020-services-twitter-statuses-update.phpt"
+                      role="test" />
+                <file name="025-services-twitter-statuses-destroy.phpt"
+                      role="test" />
+                <file name="026-services-twitter-statuses-friends.phpt"
+                      role="test" />
+                <file name="027-services-twitter-statuses-followers.phpt"
+                      role="test" />
+                <file name="028-services-twitter-statuses-featured.phpt"
+                      role="test" />
+                <file name="030-services-twitter-exception.phpt"
+                      role="test" />
+                <file name="100-services-twitter-users-show.phpt"
+                      role="test" />
+                <file name="200-services-twitter-direct-messages.phpt"
+                      role="test" />
+                <file name="205-services-twitter-direct-messages-sent.phpt"
+                      role="test" />
+                <file name="210-services-twitter-direct-messages-new.phpt"
+                      role="test" />
+                <file name="215-services-twitter-direct-messages-destroy.phpt"
+                      role="test" />
+                <file name="300-services-twitter-friendships-create.phpt"
+                      role="test" />
+                <file name="305-services-twitter-friendships-destroy.phpt"
+                      role="test" />
+                <file name="400-services-twitter-account-verify-credentials.phpt"
+                      role="test" />
+                <file name="tests-config.php.example"
+                      role="test" /> 
+            </dir>
+        </dir>
+    </contents>
+    <dependencies>
+        <required>
+            <php>
+                <min>5.2.0</min>
+            </php>
+            <pearinstaller>
+                <min>1.4.0b1</min>
+            </pearinstaller>
+            <extension>
+                <name>curl</name>
+            </extension>
+        </required>
+    </dependencies>
+    <phprelease />
+    <changelog>
+    </changelog>
+</package>
