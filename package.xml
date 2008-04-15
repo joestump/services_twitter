@@ -27,8 +27,8 @@
 
     <date>2008-04-12</date>
     <version>
-        <release>0.0.1</release>
-        <api>0.0.1</api>
+        <release>0.0.2</release>
+        <api>0.0.2</api>
     </version>
     <stability>
         <release>beta</release>
@@ -36,7 +36,13 @@
     </stability>
     <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
     <notes><![CDATA[
-        * Initial release
+        * Added Services_Twitter_Account::expire_session() + tests
+        * Added Services_Twitter_Account::archive() + tests
+        * Added Services_Twitter::favorites() + tests
+        * Added Services_Twitter_Favorites::create() + tests
+        * Added Services_Twitter_Favorites::destroy() + tests
+        * Added Services_Twitter_Notifications::leave() + tests
+        * Added Services_Twitter_Notifications::follow() + tests
     ]]></notes>
     <contents>
         <dir name="/">
@@ -136,6 +142,20 @@
                       role="test" />
                 <file name="400-services-twitter-account-verify-credentials.phpt"
                       role="test" />
+                <file name="405-services-twitter-account-end-session.phpt"
+                      role="test" />
+                <file name="410-services-twitter-account-archive.phpt"
+                      role="test" />
+                <file name="500-services-twitter-favorites.phpt"
+                      role="test" />
+                <file name="505-services-twitter-favorites-create.phpt"
+                      role="test" />
+                <file name="510-services-twitter-favorites-destroy.phpt"
+                      role="test" />
+                <file name="600-services-twitter-notifications-leave.phpt"
+                      role="test" />
+                <file name="605-services-twitter-notifications-follow.phpt"
+                      role="test" />
                 <file name="tests-config.php.example"
                       role="test" /> 
             </dir>
@@ -156,5 +176,20 @@
     </dependencies>
     <phprelease />
     <changelog>
+        <release>
+            <date>2008-04-15</date>
+            <version>
+                <release>0.0.1</release>
+                <api>0.0.1</api>
+            </version>
+            <stability>
+                <release>beta</release>
+                <api>beta</api>
+            </stability>
+            <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
+            <notes><![CDATA[
+                * Initial release
+            ]]></notes>
+        </release>
     </changelog>
 </package>
