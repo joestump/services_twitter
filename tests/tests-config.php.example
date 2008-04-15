@@ -23,6 +23,9 @@
 // !!!WARNING!!! This direct message WILL be deleted permanently from Twitter!
 // $directMessageToDelete = '';
 
+// A status ID to use for testing favorites.
+$favoriteID = 789673391;
+
 set_include_path(realpath(dirname(__FILE__) . '/../') . ':' . get_include_path());
 
 if (!isset($user) || !strlen($user) || !isset($pass) || !strlen($pass)) {

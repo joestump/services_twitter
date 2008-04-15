@@ -59,35 +59,58 @@ class Services_Twitter_Exception extends PEAR_Exception
     /**
      * Call to the API that created the error
      *
-     * @var string $call
+     * @var string $call 
      */
     protected $call = '';
 
     /**
+     * The raw response returned by the API
+     *
+     * @var string $response
+     */
+    protected $response = '';
+
+    /**
      * Constructor
      *
-     * @param string  $message Error message
-     * @param integer $code    Error code
-     * @param string  $call    API call that generated error
+     * @param string  $message  Error message
+     * @param integer $code     Error code
+     * @param string  $call     API call that generated error
+     * @param string  $response The raw response that produced the erorr
      *
      * @see Services_Twitter_Exception::$call
      * @link http://php.net/exceptions
      */
-    public function __construct($message = null, $code = 0, $call = '') 
+    public function __construct($message = null, 
+                                $code = 0, 
+                                $call = '',
+                                $response = '') 
     {
         parent::__construct($message, $code);
         $this->call = $call;
+        $this->response = $response;
     }
 
     /**
      * Return API call
      *
-     * @return      string
-     * @see         Services_Twitter_Exception::$call
+     * @return string
+     * @see Services_Twitter_Exception::$call
      */
     public function getCall()
     {
         return $this->call;
+    }
+
+    /**
+     * Get the raw API response that died   
+     *
+     * @return string
+     * @see Services_Twitter_Exception::$response
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 
     /**

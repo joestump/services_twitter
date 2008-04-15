@@ -54,7 +54,31 @@
  */
 class Services_Twitter_Notifications extends Services_Twitter_Common
 {
+    /**
+     * Quit getting status updates from a person
+     *
+     * @param integer $id The username/ID of the person to stop statuses of
+     * 
+     * @throws Services_Twitter_Exception
+     * @return object Instance of SimpleXMLElement
+     */
+    public function leave($id)
+    {
+        return $this->sendRequest('/notifications/leave/' . $id);
+    }
 
+    /**
+     * Get status updates from a person
+     *
+     * @param integer $id The username/ID of the person to get statuses of
+     * 
+     * @throws Services_Twitter_Exception
+     * @return object Instance of SimpleXMLElement
+     */
+    public function follow($id)
+    {
+        return $this->sendRequest('/notifications/follow/' . $id);
+    }
 }
 
 ?>

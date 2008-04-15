@@ -110,11 +110,13 @@ class Services_Twitter extends Services_Twitter_Common
      * @see         Services_Twitter::__get()
      */
     static protected $methods = array(
-        'statuses' => 'Statuses',
-        'users' => 'Users',
+        'account' => 'Account',
         'direct_messages' => 'DirectMessages',
+        'favorites' => 'Favorites',
         'friendships' => 'Friendships',
-        'account' => 'Account'
+        'notifications' => 'Notifications',
+        'statuses' => 'Statuses',
+        'users' => 'Users'
     );
 
     /**

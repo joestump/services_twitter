@@ -65,6 +65,28 @@ class Services_Twitter_Account extends Services_Twitter_Common
         $res = $this->sendRequest('/account/verify_credentials');
         return ((string)$res === 'true');
     }
+
+    /**
+     * End a person's session
+     *
+     * Insert long rant about Twitter's API being inconsistent. This endpoint
+     * returns 'Logged out.' in plain text so we overload it and check the
+     * response string from the exception inevitably thrown when it can't
+     * parse the XML.
+     *
+     * @return boolean
+     * @see Services_Twitter_Common::sendRequest()
+     * @see Services_Twitter_Error::getResponse()
+     */
+    public function end_session()
+    {
+        try {
+            $res = $this->sendRequest('/account/end_session');
+        } catch (Services_Twitter_Exception $e) {
+            $res = $e->getResponse();
+            return (trim(strval($res)) == 'Logged out.');
+        }
+    }
 }
 
 ?>

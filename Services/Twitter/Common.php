@@ -167,7 +167,7 @@ abstract class Services_Twitter_Common
         if (!$xml instanceof SimpleXMLElement) {
             throw new Services_Twitter_Exception(
                 'Could not parse response received by the API', 
-                Services_Twitter::ERROR_UNKNOWN, $uri
+                Services_Twitter::ERROR_UNKNOWN, $uri, $res
             );
         }
 

@@ -54,7 +54,31 @@
  */
 class Services_Twitter_Favorites extends Services_Twitter_Common
 {
+    /**
+     * Favorite a status ID
+     *
+     * @param integer $id The status ID to favorite
+     *
+     * @throws Services_Twitter_Exception
+     * @return object Instance of SimpleXMLElement
+     */
+    public function create($id)
+    {
+        return $this->sendRequest('/favorites/create/' . intval($id));
+    }
 
+    /**
+     * Unfavorite a status ID
+     *
+     * @param integer $id The status ID to unfavorite
+     *
+     * @throws Services_Twitter_Exception
+     * @return object Instance of SimpleXMLElement
+     */
+    public function destroy($id)
+    {
+        return $this->sendRequest('/favorites/destroy/' . intval($id));
+    }
 }
 
 ?>
