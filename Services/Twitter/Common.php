@@ -34,7 +34,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category  Services
- * @package   Services_TinyURL
+ * @package   Services_Twitter
  * @author    Joe Stump <joe@joestump.net> 
  * @copyright 1997-2007 Joe Stump <joe@joestump.net> 
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
