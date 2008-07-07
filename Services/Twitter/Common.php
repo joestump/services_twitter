@@ -38,7 +38,7 @@
  * @author    Joe Stump <joe@joestump.net> 
  * @copyright 1997-2007 Joe Stump <joe@joestump.net> 
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   CVS: $Id$
+ * @version   Release: @package_version@
  * @link      http://twitter.com/help/api
  * @link      http://twitter.com
  */
@@ -79,6 +79,19 @@ abstract class Services_Twitter_Common
     protected $pass = '';
 
     /**
+     * Options for HTTP requests and misc. 
+     *
+     * - timetout 
+     *
+     * @access protected
+     * @var array $options An array of various options
+     */
+    protected $options = array(
+        'timeout' => 30,
+        'userAgent' => 'Services_Twitter @package_version@'
+    );
+
+    /**
      * Constructor
      *
      * @param string $user Twitter username
@@ -90,6 +103,49 @@ abstract class Services_Twitter_Common
     {
         $this->user = $user;
         $this->pass = $pass;
+    }
+
+    /**
+     * Set an option in {@link Services_Twitter_Common::$options}
+     *
+     * If a function exists named _set$option (e.g. _setUserAgent()) then that
+     * method will be used instead. Otherwise, the value is set directly into
+     * the options array.
+     *
+     * @param string $option Name of option
+     * @param mixed  $value  Value of option
+     *
+     * @throws InvalidArgumentException on invalid option names
+     * @see Services_Twitter_Common::$options
+     * @return void
+     */
+    public function setOption($option, $value)
+    {
+        if (!is_string($option)) {
+            throw new InvalidArgumentException('Option names must be strings');
+        }
+
+        $func = '_set' . ucfirst($option);
+        if (method_exists($this, $func)) {
+            $this->$func($value);
+        } else {
+            $this->options[$option] = $value;
+        } 
+    }
+
+    /**
+     * Set a number of options at once
+     *
+     * @param array $options The options to set
+     *
+     * @return void
+     * @see Services_Twitter_Common::setOption()
+     */
+    public function setOptions(array $options)
+    {
+        foreach ($options as $option => $value) {
+            $this->setOption($option, $value);
+        }
     }
 
     /**
@@ -114,9 +170,10 @@ abstract class Services_Twitter_Common
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Services_Twitter');
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->options['userAgent']);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_USERPWD, $this->user . ':' . $this->pass);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->options['timeout']);
 
         $sets = array();
         foreach ($params as $key => $val) {

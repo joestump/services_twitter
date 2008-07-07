@@ -38,7 +38,7 @@
  * @author    Joe Stump <joe@joestump.net> 
  * @copyright 1997-2007 Joe Stump <joe@joestump.net> 
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   CVS: $Id$
+ * @version   Release: @package_version@
  * @link      http://twitter.com/help/api
  * @link      http://twitter.com
  */
@@ -87,7 +87,7 @@ class Services_Twitter_Exception extends PEAR_Exception
                                 $response = '') 
     {
         parent::__construct($message, $code);
-        $this->call = $call;
+        $this->call     = $call;
         $this->response = $response;
     }
 
