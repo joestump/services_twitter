@@ -1,5 +1,15 @@
 --TEST--
 Services_Twitter_DirectMessages::new()
+--SKIPIF--
+<?php
+
+require_once 'tests-config.php';
+
+if (!isset($aFriendOfMine) || !strlen($aFriendOfMine)) {
+    echo 'skip $aFriendOfMine is not set properly';
+}
+
+?>
 --FILE--
 <?php
 
