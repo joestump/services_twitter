@@ -34,7 +34,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category  Services
- * @package   Services_TinyURL
+ * @package   Services_Twitter
  * @author    Joe Stump <joe@joestump.net> 
  * @copyright 1997-2007 Joe Stump <joe@joestump.net> 
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
@@ -57,7 +57,7 @@ require_once 'Services/Twitter/Common.php';
  * $password = 'Your_Password';
  *
  * try {
- *     $twitter = new Services_TinyURL($username, $password);
+ *     $twitter = new Services_Twitter($username, $password);
  *     $msg = $twitter->statuses->update("I'm coding with PEAR right now!");
  *     print_r($msg); // Should be a SimpleXMLElement structure
  * } catch (Services_Twitter_Exception $e) {
