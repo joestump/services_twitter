@@ -58,9 +58,9 @@ class Services_Twitter
      * @global integer ERROR_ENDPOINT Bad endpoint
      * @global integer ERROR_PARAMS   Bad endpoint parameters
      */
-    const ERROR_UNKNOWN     = 1;
-    const ERROR_ENDPOINT    = 2;
-    const ERROR_PARAMS      = 3;
+    const ERROR_UNKNOWN  = 1;
+    const ERROR_ENDPOINT = 2;
+    const ERROR_PARAMS   = 3;
     /**#@-*/
 
     /**#@+
@@ -351,9 +351,8 @@ class Services_Twitter
             // we have a POST method and a registered source to pass
             $params['source'] = $this->options['source'];
         }
-        $hasRequiredArgs = count(
-            $endpoint->xpath('param[@required="true" or @required="1"]')
-        );
+        $xpath           = 'param[@required="true" or @required="1"]';
+        $hasRequiredArgs = count($endpoint->xpath($xpath));
         if (!$hasRequiredArgs && (isset($args[0]) && !is_array($args[0]))) {
             throw new Services_Twitter_Exception(
                 $path . ' expects an array as unique parameter',
