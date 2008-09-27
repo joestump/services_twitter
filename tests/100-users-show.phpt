@@ -18,6 +18,7 @@ require_once 'Services/Twitter.php';
 
 $twitter = new Services_Twitter($user, $pass, array('test' => true));
 echo $twitter->users->show('foo');
+echo $twitter->users->show('foo@example.com');
 
 // this allows for testing live against the service, or locally
 if (isset($live) && $live == true) {
@@ -34,4 +35,5 @@ if (isset($live) && $live == true) {
 ?>
 --EXPECT--
 GET	http://twitter.com/users/show/foo.xml	
+GET	http://twitter.com/users/show.xml	email=foo%40example.com
 bool(true)

@@ -373,6 +373,11 @@ class Services_Twitter
             } else {
                 continue;
             }
+            if ($path == '/users/show' && strpos($arg, '@') !== false) {
+                // XXX fixes Twitter API inconsistency in /users/show endpoint
+                $params['email'] = $arg;
+                continue;
+            }
             try {
                 $this->validateArg($pName, $arg, $pReq, $pType, $pMaxLength);
             } catch (Exception $exc) {
@@ -457,7 +462,7 @@ class Services_Twitter
             }
             break;
         case 'id_or_screenname':
-            if (!preg_match('/^[a-z0-9_@]+$/', $val)) {
+            if (!preg_match('/^[a-z0-9_]+$/', $val)) {
                 $msg = $name . ' must be a valid id or screen name';
             }
             break;
