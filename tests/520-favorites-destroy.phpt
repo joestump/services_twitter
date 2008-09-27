@@ -6,7 +6,7 @@ favorites-destroy
 require_once dirname(__FILE__) . '/tests.inc.php';
 
 if (!isset($statusID) || !$statusID) {
-    echo '$statusID is not set properly';
+    echo 'skip $statusID is not set properly';
 }
 
 ?>

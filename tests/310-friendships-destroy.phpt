@@ -6,7 +6,7 @@ friendships-destroy
 require_once dirname(__FILE__) . '/tests.inc.php';
 
 if (!isset($aFriendOfMine) || !strlen($aFriendOfMine)) {
-    echo '$aFriendOfMine is not set properly';
+    echo 'skip $aFriendOfMine is not set properly';
 }
 
 ?>
