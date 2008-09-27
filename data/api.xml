@@ -60,6 +60,13 @@ http://pear.php.net/packages/Services_Twitter
             <formats>xml,json</formats>
             <param name="id" type="integer" required="true"/>
         </endpoint>
+        <!-- 
+        FIXME API inconsistency: the two endpoints below belong to user methods
+        in the API documentation, but their path is set to "statuses", so we
+        keep them here for now.
+        Maybe we could duplicate them in the "users" category ?
+        I think they belong more to "users" category anyway...
+        -->
         <endpoint name="friends" method="GET" auth_required="true">
             <formats>xml,json</formats>
             <param name="id" type="id_or_screenname" required="false"/>
