@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This is the xml mapping of the Twitter REST API documented at:
+http://apiwiki.twitter.com/REST+API+Documentation
+
+This mapping is part of the PEAR Services_Twitter package available at: 
+http://pear.php.net/packages/Services_Twitter
+
+@category  Services
+@package   Services_Twitter
+@author    Joe Stump <joe@joestump.net> 
+@author    David Jean Louis <izimobil@gmail.com> 
+@copyright 1997-2008 Joe Stump <joe@joestump.net> 
+@license   http://www.opensource.org/licenses/bsd-license.php New BSD License
+@version   SVN: $Id$
+-->
+
+<api>
+
+    <!-- 
+    Status methods, documentation available at:
+    http://apiwiki.twitter.com/REST+API+Documentation#StatusMethods
+    -->
+    <category name="statuses">
+        <endpoint name="public_timeline" method="GET" auth_required="false">
+            <formats>xml,json,rss,atom</formats>
+        </endpoint>
+        <endpoint name="friends_timeline" method="GET" auth_required="true">
+            <formats>xml,json,rss,atom</formats>
+            <param name="since" type="date" required="false"/>
+            <param name="since_id" type="integer" required="false"/>
+            <param name="count" type="integer" max_length="200" required="false"/>
+            <param name="page" type="integer" required="false"/>
+        </endpoint>
+        <endpoint name="user_timeline" method="GET" auth_required="true">
+            <formats>xml,json,rss,atom</formats>
+            <param name="id" type="id_or_screenname" required="false"/>
+            <param name="since" type="date" required="false"/>
+            <param name="since_id" type="integer" required="false"/>
+            <param name="count" type="integer" max_length="200" required="false"/>
+            <param name="page" type="integer" required="false"/>
+        </endpoint>
+        <endpoint name="show" method="GET" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="integer" required="true"/>
+        </endpoint>
+        <endpoint name="update" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="status" type="string" max_length="140" required="true"/>
+            <param name="in_reply_to_status_id" type="integer" required="false"/>
+        </endpoint>
+        <endpoint name="replies" method="GET" auth_required="true">
+            <formats>xml,json,rss,atom</formats>
+            <param name="since" type="date" required="false"/>
+            <param name="since_id" type="integer" required="false"/>
+            <param name="page" type="integer" required="false"/>
+        </endpoint>
+        <endpoint name="destroy" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="integer" required="true"/>
+        </endpoint>
+        <endpoint name="friends" method="GET" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="id_or_screenname" required="false"/>
+            <param name="since" type="date" required="false"/>
+            <param name="page" type="integer" required="false"/>
+        </endpoint>
+        <endpoint name="followers" method="GET" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="id_or_screenname" required="false"/>
+            <param name="page" type="integer" required="false"/>
+        </endpoint>
+    </category>
+
+    <!-- 
+    User methods, documentation available at:
+    http://apiwiki.twitter.com/REST+API+Documentation#UserMethods
+    -->
+    <category name="users">
+        <endpoint name="show" method="GET" auth_required="true" min_args="1">
+            <formats>xml,json</formats>
+            <param name="id" type="id_or_screenname" required="true"/>
+        </endpoint>
+    </category>
+
+    <!-- 
+    Direct message methods, documentation available at:
+    http://apiwiki.twitter.com/REST+API+Documentation#DirectMessageMethods
+    -->
+    <category name="direct_messages">
+        <endpoint name="direct_messages" method="GET" auth_required="true">
+            <formats>xml,json,rss,atom</formats>
+            <param name="since" type="date" required="false"/>
+            <param name="since_id" type="integer" required="false"/>
+            <param name="page" type="integer" required="false"/>
+        </endpoint>
+        <endpoint name="sent" method="GET" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="since" type="date" required="false"/>
+            <param name="since_id" type="integer" required="false"/>
+            <param name="page" type="integer" required="false"/>
+        </endpoint>
+        <endpoint name="new" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="user" type="id_or_screenname" required="true"/>
+            <param name="text" type="string" max_length="140" required="true"/>
+        </endpoint>
+        <endpoint name="destroy" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="integer" required="true"/>
+        </endpoint>
+    </category>
+
+    <!--
+    Frienship methods, documentation available at:
+    http://apiwiki.twitter.com/REST+API+Documentation#FriendshipMethods
+    -->
+    <category name="friendships">
+        <endpoint name="create" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="id_or_screenname" required="true"/>
+            <param name="follow" type="boolean" required="false"/>
+        </endpoint>
+        <endpoint name="destroy" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="id_or_screenname" required="true"/>
+        </endpoint>
+        <endpoint name="exists" method="GET" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="user_a" type="id_or_screenname" required="true"/>
+            <param name="user_b" type="id_or_screenname" required="true"/>
+        </endpoint>
+    </category>
+
+    <!--
+    Account methods, documentation available at:
+    http://apiwiki.twitter.com/REST+API+Documentation#AccountMethods
+    -->
+    <category name="account">
+        <endpoint name="verify_credentials" method="GET" auth_required="true">
+            <formats>xml,json</formats>
+        </endpoint>
+        <endpoint name="end_session" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+        </endpoint>
+        <endpoint name="update_location" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="location" type="string" required="true"/>
+        </endpoint>
+        <endpoint name="update_delivery_device" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="device" type="device" required="true"/>
+        </endpoint>
+        <endpoint name="rate_limit_status" method="GET" auth_required="true">
+            <formats>xml,json</formats>
+        </endpoint>
+    </category>
+
+    <!--
+    Favorites methods, documentation available at:
+    http://apiwiki.twitter.com/REST+API+Documentation#FavoritesMethods
+    -->
+    <category name="favorites">
+        <endpoint name="favorites" method="GET" auth_required="true">
+            <formats>xml,json,rss,atom</formats>
+            <param name="id" type="id_or_screenname" required="false"/>
+            <param name="page" type="integer" required="false"/>
+        </endpoint>
+        <endpoint name="create" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="integer" required="true"/>
+        </endpoint>
+        <endpoint name="destroy" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="integer" required="true"/>
+        </endpoint>
+    </category>
+
+    <!--
+    Notification methods, documentation available at:
+    http://apiwiki.twitter.com/REST+API+Documentation#NotificationMethods
+    -->
+    <category name="notifications">
+        <endpoint name="follow" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="id_or_screenname" required="true"/>
+        </endpoint>
+        <endpoint name="leave" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="id_or_screenname" required="true"/>
+        </endpoint>
+    </category>
+
+    <!--
+    Block methods, documentation available at:
+    http://apiwiki.twitter.com/REST+API+Documentation#BlockMethods
+    -->
+    <category name="blocks">
+        <endpoint name="create" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="id_or_screenname" required="true"/>
+        </endpoint>
+        <endpoint name="destroy" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="id" type="id_or_screenname" required="true"/>
+        </endpoint>
+    </category>
+
+    <!--
+    Help methods, documentation available at:
+    http://apiwiki.twitter.com/REST+API+Documentation#HelpMethods
+    -->
+    <category name="help">
+        <endpoint name="test" method="GET" auth_required="false">
+            <formats>xml,json</formats>
+        </endpoint>
+        <endpoint name="downtime_schedule" method="GET" auth_required="false">
+            <formats>xml,json</formats>
+        </endpoint>
+    </category>
+
+</api>

@@ -1,14 +1,30 @@
 <?php
 
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
 /**
- * Tests config file
- * 
- * @author      Joe Stump <joe@joestump.net>
- * @package     Services_Twitter
+ * Tests configuration file.
+ *
+ * PHP version 5.1.0+
+ *
+ * @category  Services
+ * @package   Services_Twitter
+ * @author    Joe Stump <joe@joestump.net> 
+ * @author    David Jean Louis <izimobil@gmail.com> 
+ * @copyright 1997-2008 Joe Stump <joe@joestump.net> 
+ * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
+ * @version   SVN: $Id$
+ * @link      http://twitter.com/help/api
+ * @link      http://twitter.com
  */
 
-// Uncomment the following code and add the correct information. All tests 
-// will fail if you do not enter this information.
+// Uncomment this to run tests "live" against Twitter servers
+// $live = true;
+
+// Uncomment the following code and add the correct information. All live
+// tests will fail if you do not provide this information.
+// CAUTION: tests will do various things with this account, and change various 
+// settings, so you'd better use an account dedicated to testing
 // $user = 'XXXXXXX';
 // $pass = 'ZZZZZZZ';
 
@@ -18,18 +34,11 @@
 // be a valid username or id.
 // $aFriendOfMine = 'XXXXXXX';
 
-// Uncomment the following line of code to test the destruction of direct 
-// messages. You must put a direct message that was sent to $user above.
-// !!!WARNING!!! This direct message WILL be deleted permanently from Twitter!
-// $directMessageToDelete = '';
-
-// A status ID to use for testing favorites.
-$favoriteID = 789673391;
+// A status ID
+$statusID = 789673391;
 
 set_include_path(realpath(dirname(__FILE__) . '/../') . ':' . get_include_path());
 
 if (!isset($user) || !strlen($user) || !isset($pass) || !strlen($pass)) {
     die("Please set your username / password in the tests config file\n");
 }
-
-?>
