@@ -125,7 +125,7 @@ class Services_Twitter extends Services_Twitter_Common
      * @var         array       $instances
      * @see         Services_Twitter::__get(), Services_Twitter::$methods
      */
-    static protected $instances = array();
+    protected $instances = array();
 
     /**
      * Lazily load Twitter API drivers
@@ -156,16 +156,16 @@ class Services_Twitter extends Services_Twitter_Common
      */
     protected function factory($method)
     {
-        if (isset(self::$instances[$method])) {
-            return self::$instances[$method];
+        if (isset($this->instances[$method])) {
+            return $this->instances[$method];
         }
 
         $file = 'Services/Twitter/' . $method . '.php';
         include_once $file;
         
         $class = 'Services_Twitter_' . $method;
-        self::$instances[$method] = new $class($this->user, $this->pass);
-        return self::$instances[$method];
+        $this->instances[$method] = new $class($this->user, $this->pass);
+        return $this->instances[$method];
     }
 }
 
