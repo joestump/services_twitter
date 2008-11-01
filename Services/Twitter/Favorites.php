@@ -64,7 +64,9 @@ class Services_Twitter_Favorites extends Services_Twitter_Common
      */
     public function create($id)
     {
-        return $this->sendRequest('/favorites/create/' . intval($id));
+        return $this->sendRequest(
+            '/favorites/create/' . intval($id), array(), 'POST'
+        );
     }
 
     /**
@@ -77,7 +79,9 @@ class Services_Twitter_Favorites extends Services_Twitter_Common
      */
     public function destroy($id)
     {
-        return $this->sendRequest('/favorites/destroy/' . intval($id));
+        return $this->sendRequest(
+            '/favorites/destroy/' . intval($id), array(), 'POST'
+        );
     }
 }
 

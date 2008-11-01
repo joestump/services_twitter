@@ -76,16 +76,62 @@ class Services_Twitter_Account extends Services_Twitter_Common
      *
      * @return boolean
      * @see Services_Twitter_Common::sendRequest()
-     * @see Services_Twitter_Error::getResponse()
+     * @see Services_Twitter_Exception::getResponse()
      */
     public function end_session()
     {
         try {
-            $res = $this->sendRequest('/account/end_session');
+            $res = $this->sendRequest('/account/end_session', array(), 'POST');
+            return (trim(strval($res->error)) == 'Logged out.');
         } catch (Services_Twitter_Exception $e) {
-            $res = $e->getResponse();
-            return (trim(strval($res)) == 'Logged out.');
+            return false;
         }
+    }
+
+    /**
+     * Update a user's location
+     *
+     * @param string $location The user's new location
+     *
+     * @return boolean True if the location was updated successfully
+     * @see Services_Twitter_Common::sendRequest()
+     * @link http://apiwiki.twitter.com/REST+API+Documentation#updatelocationnbsp
+     */
+    public function update_location($location)
+    {
+        try {
+            $res = $this->sendRequest(
+                '/account/update_location', array(
+                    'location' => $location
+                ), 'POST'
+            );
+
+            return (strval($res->location) == $location);
+        } catch (Services_Twitter_Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Update a user's delivery device
+     *
+     * @param string $device The new device (im, sms or none)
+     *
+     * @return object Instance of SimpleXmlElement returned from API
+     * @see Services_Twitter_Common::sendRequest()
+     * @link http://apiwiki.twitter.com/REST+API+Documentation#updatedeliverydevice
+     */
+    public function update_delivery_device($device)
+    {
+        if (!in_array($device, array('im', 'sms', 'none'))) {
+            throw new Services_Twitter_Exception('Invalid device: ' . $device);
+        }
+
+        return $this->sendRequest(
+            '/account/update_delivery_device', array(
+                    'device' => $device
+            ), 'POST'
+        );
     }
 }
 

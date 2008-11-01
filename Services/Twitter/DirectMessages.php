@@ -79,7 +79,9 @@ class Services_Twitter_DirectMessages extends Services_Twitter_Common
             );
         }
 
-        return $this->sendRequest('/direct_messages/destroy/' . $id);
+        return $this->sendRequest(
+            '/direct_messages/destroy/' . $id, array(), 'POST'
+        );
     }
 
     /**

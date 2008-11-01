@@ -77,14 +77,14 @@ class Services_Twitter extends Services_Twitter_Common
     /**
      * Twitter API error codes
      *
-     * @global      integer     ERROR_UNKNOWN       An unknown error occurred
-     * @global      integer     ERROR_REQUEST       Bad request sent
-     * @global      integer     ERROR_AUTH          Not authorized to do action
-     * @global      integer     ERROR_FORBIDDEN     Forbidden from doing action
-     * @global      integer     ERROR_NOT_FOUND     Item requested not found
-     * @global      integer     ERROR_INTERNAL      Internal Twitter error
-     * @global      integer     ERROR_DOWN          Twitter is down
-     * @global      integer     ERROR_UNAVAILABLE   API is overloaded
+     * @global integer ERROR_UNKNOWN     An unknown error occurred
+     * @global integer ERROR_REQUEST     Bad request sent
+     * @global integer ERROR_AUTH        Not authorized to do action
+     * @global integer ERROR_FORBIDDEN   Forbidden from doing action
+     * @global integer ERROR_NOT_FOUND   Item requested not found
+     * @global integer ERROR_INTERNAL    Internal Twitter error
+     * @global integer ERROR_DOWN        Twitter is down
+     * @global integer ERROR_UNAVAILABLE API is overloaded
      */
     const ERROR_UNKNOWN     = 1;
     const ERROR_REQUEST     = 400;
@@ -94,6 +94,15 @@ class Services_Twitter extends Services_Twitter_Common
     const ERROR_INTERNAL    = 500;
     const ERROR_DOWN        = 502;
     const ERROR_UNAVAILABLE = 503;
+
+    /**
+     * Twitter API output parsing options
+     *
+     * @global string OUTPUT_XML  The response is expected to be XML
+     * @global string OUTPUT_JSON The response is expected to be JSON
+     */
+    const OUTPUT_XML  = 'xml';
+    const OUTPUT_JSON = 'json';
 
     /**
      * Public URI of Twitter's API
@@ -110,13 +119,14 @@ class Services_Twitter extends Services_Twitter_Common
      * @see         Services_Twitter::__get()
      */
     static protected $methods = array(
-        'account' => 'Account',
+        'account'         => 'Account',
         'direct_messages' => 'DirectMessages',
-        'favorites' => 'Favorites',
-        'friendships' => 'Friendships',
-        'notifications' => 'Notifications',
-        'statuses' => 'Statuses',
-        'users' => 'Users'
+        'favorites'       => 'Favorites',
+        'friendships'     => 'Friendships',
+        'notifications'   => 'Notifications',
+        'statuses'        => 'Statuses',
+        'users'           => 'Users',
+        'search'          => 'Search'
     );
 
     /**

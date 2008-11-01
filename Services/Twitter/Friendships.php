@@ -79,7 +79,10 @@ class Services_Twitter_Friendships extends Services_Twitter_Common
                 );
             }
 
-            return $this->sendRequest('/friendships/' . $function . '/' . $args[0]);
+            return $this->sendRequest(
+                '/friendships/' . $function . '/' . $args[0], array(), 'POST'
+            );
+
             break;
         default:
             throw new Services_Twitter_Exception(
