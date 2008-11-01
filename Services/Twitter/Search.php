@@ -44,93 +44,81 @@
  */
 
 /**
- * Services_Twitter_Account
+ * Services_Twitter_Search
  *
  * @category Services
  * @package  Services_Twitter
  * @author   Joe Stump <joe@joestump.net> 
  * @license  http://www.opensource.org/licenses/bsd-license.php New BSD License
  * @link     http://twitter.com
+ * @link     http://apiwiki.twitter.com/Search+API+Documentation
  */
-class Services_Twitter_Account extends Services_Twitter_Common
+class Services_Twitter_Search extends Services_Twitter_Common
 {
     /**
-     * Verify a user's credentials
+     * The search API's URI
      *
-     * @return boolean
-     * @see Services_Twitter_Common::sendRequest()
+     * @var string $uri The search API's URI
+     * @link http://apiwiki.twitter.com/Search+API+Documentation
      */
-    public function verify_credentials()
+    static private $uri = 'http://search.twitter.com';
+
+    /**
+     * Constructor
+     *
+     * @see Services_Twitter_Common::sendRequest()
+     * @see Services_Twitter_Common::__construct()
+     * @return void
+     */
+    public function __construct()
     {
-        $res = $this->sendRequest('/account/verify_credentials');
-        return ((string)$res === 'true');
+        // Disables authentication in sendRequest()
+        $this->user = $this->pass = null;
     }
 
     /**
-     * End a person's session
+     * Get search trends
      *
-     * Insert long rant about Twitter's API being inconsistent. This endpoint
-     * returns 'Logged out.' in plain text so we overload it and check the
-     * response string from the exception inevitably thrown when it can't
-     * parse the XML.
-     *
-     * @return boolean
-     * @see Services_Twitter_Common::sendRequest()
-     * @see Services_Twitter_Exception::getResponse()
+     * @return object The top ten trends on Twitter
+     * @see Services_Twitter_Search::sendRequest()
+     * @throws {@link Services_Twitter_Exception} on API/HTTP errors
      */
-    public function end_session()
+    public function trends()
     {
-        try {
-            $res = $this->sendRequest('/account/end_session', array(), 'POST');
-            return (trim(strval($res->error)) == 'Logged out.');
-        } catch (Services_Twitter_Exception $e) {
-            return false;
-        }
+        return $this->sendRequest('/trends');
     }
 
     /**
-     * Update a user's location
+     * Query the search API
      *
-     * @param string $location The user's new location
-     *
-     * @return boolean True if the location was updated successfully
-     * @see Services_Twitter_Common::sendRequest()
-     * @link http://apiwiki.twitter.com/REST+API+Documentation#updatelocationnbsp
+     * @param string $query The full query to send
+     * 
+     * @throws {@link Services_Twitter_Exception} on API/HTTP errors
+     * @return object The results of the query according to the API
+     * @see Services_Twitter_Search::sendRequest()
      */
-    public function update_location($location)
+    public function query($query)
     {
-        try {
-            $res = $this->sendRequest(
-                '/account/update_location', array(
-                    'location' => $location
-                ), 'POST'
-            );
-
-            return (strval($res->location) == $location);
-        } catch (Services_Twitter_Exception $e) {
-            return false;
-        }
+        return $this->sendRequest('/search', array('q' => $query));
     }
 
     /**
-     * Update a user's delivery device
+     * Send a special request to Search API
      *
-     * @param string $device The new device (im, sms or none)
+     * @param string $endPoint The search API endpoint minus extension
+     * @param array  $params   An array of parameters
      *
-     * @return object Instance of SimpleXmlElement returned from API
-     * @see Services_Twitter_Common::sendRequest()
-     * @link http://apiwiki.twitter.com/REST+API+Documentation#updatedeliverydevice
+     * @throws {@link Services_Twitter_Exception} on API/HTTP errors
+     * @return object Instance of stdClass of JSON response
+     * @see Services_Common::sendRequest()
      */
-    public function update_delivery_device($device)
+    protected function sendRequest($endPoint, array $params = array())
     {
-        if (!in_array($device, array('im', 'sms', 'none'))) {
-            throw new Services_Twitter_Exception('Invalid device: ' . $device);
-        }
-
-        return $this->sendRequest(
-            '/account/update_delivery_device', array(
-                    'device' => $device
-            ), 'POST'
+        $endPoint = self::$uri . $endPoint . '.' . 
+                    Services_Twitter::OUTPUT_JSON;
+        
+        return parent::sendRequest(
+                $endPoint, $params, 'GET', Services_Twitter::OUTPUT_JSON
         );
     }
 }

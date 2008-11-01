@@ -44,6 +44,7 @@
  */
 
 require_once 'Services/Twitter/Exception.php';
+require_once 'Validate.php';
 
 /**
  * Services_Twitter_Common
@@ -160,20 +161,44 @@ abstract class Services_Twitter_Common
      */
     protected function sendRequest($endPoint, 
                                    array $params = array(),
-                                   $method = 'GET')
+                                   $method = 'GET', 
+                                   $output = Services_Twitter::OUTPUT_XML)
     {
-        $uri = Services_Twitter::$uri . $endPoint . '.xml';    
+        // If the $endPoint is a valid URI then we use that instead of using
+        // the base URI.
+        if (Validate::uri($endPoint, 
+                          array('allowed_schemes' => array('http')))) {
+            $uri = $endPoint;
+        } else {
+            $uri = Services_Twitter::$uri . $endPoint . '.xml';    
+        } 
 
         if ($method != 'GET' && $method != 'POST') {
-            throw new Services_Twitter_Exception('Unsupported method: ' . $method);
+            throw new Services_Twitter_Exception(
+                'Unsupported method: ' . $method
+            );
         }
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->options['userAgent']);
         curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_USERPWD, $this->user . ':' . $this->pass);
+
+        // If user and pass are not set then we are using endpoints that do
+        // not require authentication.
+        if (isset($this->user) && isset($this->pass)) {
+            curl_setopt($ch, CURLOPT_USERPWD, $this->user . ':' . $this->pass);
+        }
+
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->options['timeout']);
+
+        // You can set a source in $params for most requests or via the
+        // setOption() method.
+        if (!isset($params['source'])) {
+            if (isset($this->options['source'])) {
+                $params['source'] = $this->options['source'];
+            }
+        }
 
         $sets = array();
         foreach ($params as $key => $val) {
@@ -220,15 +245,28 @@ abstract class Services_Twitter_Common
             );
         }
 
-        $xml = @simplexml_load_string($res);
-        if (!$xml instanceof SimpleXMLElement) {
-            throw new Services_Twitter_Exception(
-                'Could not parse response received by the API', 
-                Services_Twitter::ERROR_UNKNOWN, $uri, $res
-            );
-        }
+        switch ($output) {
+        case Services_Twitter::OUTPUT_XML:
+            $response = @simplexml_load_string($res);
+            if (!$response instanceof SimpleXMLElement) {
+                throw new Services_Twitter_Exception(
+                    'Could not parse XML response received by the API', 
+                    Services_Twitter::ERROR_UNKNOWN, $uri, $res
+                );
+            }
+            break;
+        case Services_Twitter::OUTPUT_JSON:
+            $response = @json_decode($res);
+            if (!$response instanceof stdClass) {
+                throw new Services_Twitter_Exception(
+                    'Could not parse JSON response received by the API', 
+                    Services_Twitter::ERROR_UNKNOWN, $uri, $res
+                );
+            }
+            break;
+        } 
 
-        return $xml;
+        return $response;
     }
 
     /**

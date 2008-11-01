@@ -64,7 +64,9 @@ class Services_Twitter_Notifications extends Services_Twitter_Common
      */
     public function leave($id)
     {
-        return $this->sendRequest('/notifications/leave/' . $id);
+        return $this->sendRequest(
+            '/notifications/leave/' . $id, array(), 'POST'
+        );
     }
 
     /**
@@ -77,7 +79,9 @@ class Services_Twitter_Notifications extends Services_Twitter_Common
      */
     public function follow($id)
     {
-        return $this->sendRequest('/notifications/follow/' . $id);
+        return $this->sendRequest(
+            '/notifications/follow/' . $id, array(), 'POST'
+        );
     }
 }
 

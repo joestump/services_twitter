@@ -44,7 +44,7 @@
  */
 
 /**
- * Services_Twitter_Exception
+ * Services_Twitter_Statuses
  *
  * @category Services
  * @package  Services_Twitter
@@ -79,19 +79,22 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
      */
     public function destroy($id)
     {
-        return $this->sendRequest('/statuses/destroy/' . (int)$id);
+        return $this->sendRequest(
+            '/statuses/destroy/' . (int)$id, array(), 'POST'
+        );
     }
 
     /**
      * Update the Twitter status
      *
-     * @param string $status New Twitter status
+     * @param string  $status    New Twitter status
+     * @param integer $inReplyTo Status ID being replied to
      * 
      * @return object Instance of SimpleXMLElement of new status
      * @throws Services_Twitter_Exception
      * @see Services_Twitter_Common::sendRequest()
      */
-    public function update($status)
+    public function update($status, $inReplyTo = 0)
     {
         if (!strlen($status)) {
             throw new Services_Twitter_Exception(
@@ -99,13 +102,19 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
             );
         }
 
-        return $this->sendRequest('/statuses/update', array(
+        $params = array(
             'status' => $status
-        ), 'POST');
+        );
+
+        if ((int)$inReplyTo > 0) {
+            $params['in_reply_to_status_id'] = (int)$inReplyTo;
+        }
+
+        return $this->sendRequest('/statuses/update', $params, 'POST'); 
     }
 
     /**
-     * Get the user's friends' timeline
+     * Get the user's timeline
      *
      * This method was overridden from the normal 
      * Services_Twitter_Common::__call() because it can optionally take an $id
@@ -119,9 +128,9 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
      * @throws Services_Twitter_Exception
      * @see Services_Twitter_Common::sendRequest()
      */
-    public function friends_timeline(array $params = array())
+    public function user_timeline(array $params = array())
     {
-        $allowed = array('id', 'since', 'page');
+        $allowed = array('id', 'since', 'since_id', 'page');
         $tmp     = array();
         foreach ($params as $key => $val) {
             if (in_array($key, $allowed)) {
@@ -129,7 +138,7 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
             }
         }
 
-        $endPoint = '/statuses/friends_timeline';
+        $endPoint = '/statuses/user_timeline';
         if (isset($tmp['id'])) {
             $endPoint .= '/' . $tmp['id'];
             unset($tmp['id']);
@@ -139,8 +148,7 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
         if (!isset($res->status) || 
             (is_array($res->status) && !count($res->status))) {
             throw new Services_Twitter_Exception(
-                $this->user . "'s friends have no status updates or " . 
-                $this->user . " has no friends"
+                $this->user . " has no status updates" 
             );
         }
 
@@ -184,10 +192,10 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
      * @param array $params Parameters array
      * 
      * @return object Instance of SimpleXMLElement of new status
-     * @throws Services_Twitter_Exception
+     * @throws {@link Services_Twitter_Exception} on request problems
      * @see Services_Twitter_Common::sendRequest()
      */
-    public function followers(array $params = array())
+    public function followers(array $params = array(), $screenName = null)
     {
         $allowed = array('lite', 'page');
         $tmp     = array();
@@ -199,6 +207,10 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
 
         $tmp['lite'] = (isset($tmp['lite']) && 
                         $tmp['lite'] === true) ? 'true' : 'false';
+
+        if ($screenName !== null) {
+            return $this->sendRequest('/statuses/followers/' . $screenName, $tmp);
+        }
 
         return $this->sendRequest('/statuses/followers', $tmp);
     }
