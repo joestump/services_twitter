@@ -184,10 +184,10 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
      * @param array $params Parameters array
      * 
      * @return object Instance of SimpleXMLElement of new status
-     * @throws Services_Twitter_Exception
+     * @throws {@link Services_Twitter_Exception} on request problems
      * @see Services_Twitter_Common::sendRequest()
      */
-    public function followers(array $params = array())
+    public function followers(array $params = array(), $screenName = null)
     {
         $allowed = array('lite', 'page');
         $tmp     = array();
@@ -199,6 +199,10 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
 
         $tmp['lite'] = (isset($tmp['lite']) && 
                         $tmp['lite'] === true) ? 'true' : 'false';
+
+        if ($screenName !== null) {
+            return $this->sendRequest('/statuses/followers/' . $screenName, $tmp);
+        }
 
         return $this->sendRequest('/statuses/followers', $tmp);
     }
