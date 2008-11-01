@@ -165,7 +165,9 @@ abstract class Services_Twitter_Common
         $uri = Services_Twitter::$uri . $endPoint . '.xml';    
 
         if ($method != 'GET' && $method != 'POST') {
-            throw new Services_Twitter_Exception('Unsupported method: ' . $method);
+            throw new Services_Twitter_Exception(
+                'Unsupported method: ' . $method
+            );
         }
 
         $ch = curl_init();
@@ -174,6 +176,12 @@ abstract class Services_Twitter_Common
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_USERPWD, $this->user . ':' . $this->pass);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->options['timeout']);
+
+        if (!isset($params['source'])) {
+            if (isset($this->options['source'])) {
+                $params['source'] = $this->options['source'];
+            }
+        }
 
         $sets = array();
         foreach ($params as $key => $val) {

@@ -85,13 +85,14 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
     /**
      * Update the Twitter status
      *
-     * @param string $status New Twitter status
+     * @param string  $status    New Twitter status
+     * @param integer $inReplyTo Status ID being replied to
      * 
      * @return object Instance of SimpleXMLElement of new status
      * @throws Services_Twitter_Exception
      * @see Services_Twitter_Common::sendRequest()
      */
-    public function update($status)
+    public function update($status, $inReplyTo = 0)
     {
         if (!strlen($status)) {
             throw new Services_Twitter_Exception(
@@ -99,9 +100,15 @@ class Services_Twitter_Statuses extends Services_Twitter_Common
             );
         }
 
-        return $this->sendRequest('/statuses/update', array(
+        $params = array(
             'status' => $status
-        ), 'POST');
+        );
+
+        if ((int)$inReplyTo > 0) {
+            $params['in_reply_to_status_id'] = (int)$inReplyTo;
+        }
+
+        return $this->sendRequest('/statuses/update', $params); 
     }
 
     /**
