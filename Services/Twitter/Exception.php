@@ -22,14 +22,13 @@
 require_once 'PEAR/Exception.php';
 
 /**
- * Services_Twitter_Exception
+ * Exception raised by this package.
  *
  * @category Services
  * @package  Services_Twitter
  * @author   Joe Stump <joe@joestump.net> 
  * @author   David Jean Louis <izimobil@gmail.com> 
  * @license  http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @link     http://twitter.com
  */
 class Services_Twitter_Exception extends PEAR_Exception
 {
@@ -43,9 +42,9 @@ class Services_Twitter_Exception extends PEAR_Exception
     protected $call = '';
 
     /**
-     * The raw response returned by the API
+     * The HTTP response returned by the API
      *
-     * @var string $response
+     * @var HTTP_Request2_Response $response
      */
     protected $response = '';
 
@@ -53,24 +52,22 @@ class Services_Twitter_Exception extends PEAR_Exception
     // __construct() {{{
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param string  $message  Error message
-     * @param integer $code     Error code
-     * @param string  $call     API call that generated error
-     * @param string  $response The raw response that produced the erorr
+     * @param string                 $msg  Error message
+     * @param mixed                  $code Error code or parent exception
+     * @param string                 $call API call that generated error
+     * @param HTTP_Request2_Response $resp The HTTP response instance
      *
      * @see Services_Twitter_Exception::$call
+     * @see Services_Twitter_Exception::$response
      * @link http://php.net/exceptions
      */
-    public function __construct($message = null, 
-                                $code = 0, 
-                                $call = '',
-                                $response = '') 
+    public function __construct($msg = null, $code = 0, $call = null, $resp = null)
     {
-        parent::__construct($message, $code);
+        parent::__construct($msg, $code);
         $this->call     = $call;
-        $this->response = $response;
+        $this->response = $resp;
     }
 
     // }}}
@@ -91,9 +88,9 @@ class Services_Twitter_Exception extends PEAR_Exception
     // getResponse() {{{
 
     /**
-     * Get the raw API response that died   
+     * Get the API HTTP response.
      *
-     * @return string
+     * @return HTTP_Request2_Response
      * @see Services_Twitter_Exception::$response
      */
     public function getResponse()
@@ -113,8 +110,16 @@ class Services_Twitter_Exception extends PEAR_Exception
      */
     public function __toString()
     {
-        return $this->message . ' (Code: ' . $this->code . ', Call: ' . 
-               $this->call . ')';
+        $ret = '%s (%s)';
+        if ($this->code instanceof Exception) {
+            $info = $this->code->getMessage();
+        } else {
+            $info = 'code: ' . $this->code;
+        }
+        if ($this->call !== null) {
+            $info .= ', call: ' . $this->call;
+        }
+        return sprintf($ret, $this->message, $info);
     }
 
     // }}}

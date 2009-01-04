@@ -18,27 +18,17 @@
  * @link      http://twitter.com
  */
 
-// Uncomment this to run tests "live" against Twitter servers
-// $live = true;
 
-// Uncomment the following code and add the correct information. All live
-// tests will fail if you do not provide this information.
-// CAUTION: tests will do various things with this account, and change various 
-// settings, so you'd better use an account dedicated to testing
-// $user = 'XXXXXXX';
-// $pass = 'ZZZZZZZ';
-
-// Uncomment the following line of code to test direct messaging. You MUST
-// be friends with this username. Also, make sure to give them a heads up 
-// before you start willy nilly sending them a bunch of test messages. Should
-// be a valid username or id.
-// $aFriendOfMine = 'XXXXXXX';
-
-// A status ID
-$statusID = 789673391;
-
-set_include_path(realpath(dirname(__FILE__) . '/../') . ':' . get_include_path());
-
-if (!isset($user) || !strlen($user) || !isset($pass) || !strlen($pass)) {
-    die("Please set your username / password in the tests config file\n");
-}
+/**
+ * This is the test config array.
+ * If you want to test "live" against twitter server, set theses values to
+ * something real and rename this file to tests-config.php.
+ */
+$config = array(
+    'user'      => 'test_user',
+    'pass'      => 'test_password',
+    'email'     => 'test@example.com',
+    'friend'    => 'test_friend',
+    'status_id' => 100000,
+    'live_test' => true,
+);

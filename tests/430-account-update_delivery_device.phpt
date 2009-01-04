@@ -1,26 +1,18 @@
 --TEST--
-account-update_delivery_device
+account-update-delivery-device
 --FILE--
 <?php
 
-require_once dirname(__FILE__) . '/tests.inc.php';
-require_once 'Services/Twitter.php';
+require_once dirname(__FILE__) . '/setup.php';
 
-$twitter = new Services_Twitter($user, $pass, array('test' => true));
-echo $twitter->account->update_delivery_device('sms');
-
-// this allows for testing live against the service, or locally
-if (isset($live) && $live == true) {
-    // live test that must evaluate to bool(true)
-    $twitter = new Services_Twitter($user, $pass);
-    $res     = $twitter->account->update_delivery_device('im');
-    var_dump($res instanceof SimpleXMLElement);
-} else {
-    var_dump(true);
+try {
+    $twitter = Services_Twitter_factory('account/update_delivery_device');
+    $user    = $twitter->account->update_delivery_device('none');
+    var_dump($user instanceof stdclass && isset($user->id));
+} catch (Services_Twitter_Exception $exc) {
+    echo $exc . "\n";
 }
-    
 
 ?>
 --EXPECT--
-POST	http://twitter.com/account/update_delivery_device.xml	device=sms
 bool(true)

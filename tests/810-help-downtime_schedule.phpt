@@ -1,36 +1,18 @@
 --TEST--
-help-downtime_schedule
---SKIPIF--
-<?php
-
-require_once dirname(__FILE__) . '/tests.inc.php';
-
-if (!isset($aFriendOfMine) || !strlen($aFriendOfMine)) {
-    echo 'skip $aFriendOfMine is not set properly';
-}
-
-?>
+help-downtime-schedule
 --FILE--
 <?php
 
-require_once dirname(__FILE__) . '/tests.inc.php';
-require_once 'Services/Twitter.php';
+require_once dirname(__FILE__) . '/setup.php';
 
-$twitter = new Services_Twitter($user, $pass, array('test' => true));
-echo $twitter->help->downtime_schedule();
-
-// this allows for testing live against the service, or locally
-if (isset($live) && $live == true) {
-    // live test that must evaluate to bool(true)
-    $twitter = new Services_Twitter($user, $pass);
-    $res     = $twitter->help->downtime_schedule();
-    var_dump($res instanceof SimpleXMLElement);
-} else {
-    var_dump(true);
+try {
+    $twitter = Services_Twitter_factory('help/downtime_schedule');
+    $result  = $twitter->help->downtime_schedule();
+    var_dump($result instanceof stdclass);
+} catch (Services_Twitter_Exception $exc) {
+    echo $exc . "\n";
 }
-    
 
 ?>
 --EXPECT--
-GET	http://twitter.com/help/downtime_schedule.xml	
 bool(true)

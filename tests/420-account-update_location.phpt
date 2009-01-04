@@ -1,27 +1,18 @@
 --TEST--
-account-update_location
+account-update-location
 --FILE--
 <?php
 
-require_once dirname(__FILE__) . '/tests.inc.php';
-require_once 'Services/Twitter.php';
+require_once dirname(__FILE__) . '/setup.php';
 
-$twitter = new Services_Twitter($user, $pass, array('test' => true));
-echo $twitter->account->update_location('Toulouse');
-
-// this allows for testing live against the service, or locally
-if (isset($live) && $live == true) {
-    // live test that must evaluate to bool(true)
-    $twitter  = new Services_Twitter($user, $pass);
-    $location = 'Somewhere on the moon';
-    $res      = $twitter->account->update_location($location);
-    var_dump((string)$res->location == $location);
-} else {
-    var_dump(true);
+try {
+    $twitter = Services_Twitter_factory('account/update_location');
+    $user    = $twitter->account->update_location('somewhere in the moon...');
+    var_dump($user instanceof stdclass && isset($user->id));
+} catch (Services_Twitter_Exception $exc) {
+    echo $exc . "\n";
 }
-    
 
 ?>
 --EXPECT--
-POST	http://twitter.com/account/update_location.xml	location=Toulouse
 bool(true)

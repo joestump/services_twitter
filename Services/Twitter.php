@@ -3,7 +3,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * An interface for Twitter's HTTP API
+ * An interface for Twitter's REST API and Search API.
  *
  * PHP version 5.1.0+
  *
@@ -19,10 +19,14 @@
  * @filesource
  */
 
+/**
+ * Include HTTP_Request2 class and exception classes.
+ */
+require_once 'HTTP/Request2.php';
 require_once 'Services/Twitter/Exception.php';
 
 /**
- * Services_Twitter.
+ * Base class for interacting with Twitter's API.
  *
  * <code>
  * require_once 'Services/Twitter.php';
@@ -33,10 +37,11 @@ require_once 'Services/Twitter/Exception.php';
  * try {
  *     $twitter = new Services_Twitter($username, $password);
  *     $msg = $twitter->statuses->update("I'm coding with PEAR right now!");
- *     print_r($msg); // Should be a SimpleXMLElement structure
+ *     print_r($msg);
  * } catch (Services_Twitter_Exception $e) {
  *     echo $e->getMessage(); 
  * }
+ *
  * </code>
  *
  * @category Services
@@ -64,24 +69,13 @@ class Services_Twitter
     /**#@-*/
 
     /**#@+
-     * Twitter API error codes from
-     * {@link http://apiwiki.twitter.com/REST+API+Documentation#HTTPStatusCodes}
+     * Twitter API output parsing options
      *
-     * @global integer ERROR_REQUEST     Bad request sent
-     * @global integer ERROR_AUTH        Not authorized to do action
-     * @global integer ERROR_FORBIDDEN   Forbidden from doing action
-     * @global integer ERROR_NOT_FOUND   Item requested not found
-     * @global integer ERROR_INTERNAL    Internal Twitter error
-     * @global integer ERROR_DOWN        Twitter is down
-     * @global integer ERROR_UNAVAILABLE API is overloaded
+     * @global string OUTPUT_XML  The response is expected to be XML
+     * @global string OUTPUT_JSON The response is expected to be JSON
      */
-    const ERROR_REQUEST     = 400;
-    const ERROR_AUTH        = 401;
-    const ERROR_FORBIDDEN   = 403;
-    const ERROR_NOT_FOUND   = 404;
-    const ERROR_INTERNAL    = 500;
-    const ERROR_DOWN        = 502;
-    const ERROR_UNAVAILABLE = 503;
+    const OUTPUT_XML  = 'xml';
+    const OUTPUT_JSON = 'json';
     /**#@-*/
 
     // }}}
@@ -90,9 +84,16 @@ class Services_Twitter
     /**
      * Public URI of Twitter's API
      *
-     * @var string $uri URI of Twitter API
+     * @var string $uri
      */
     public static $uri = 'http://twitter.com';
+
+    /**
+     * Public URI of Twitter's Search API
+     *
+     * @var string $uri
+     */
+    public static $searchUri = 'http://search.twitter.com';
 
     /**
      * Username of Twitter user
@@ -114,13 +115,14 @@ class Services_Twitter
      * Options for HTTP requests and misc.
      *
      * Available options are:
-     * - timeout: the http request timeout in seconds;
-     * - userAgent: the user agent name to pass with the request;
-     * - test: whether to use the test mode, in test mode requests are not sent 
-     *   to the server, they are only printed out to stdout;
+     * - format: the desired output format: json (default) or xml,
+     * - raw_format: if set to true, the configured format is returned "as is",
      * - source: you can set this if you have registered a twitter source 
      *   {@see http://twitter.com/help/request_source}, your source will be 
-     *   passed with each POST request.
+     *   passed with each POST request,
+     * - validate: if set to true the class will validate api xml file against 
+     *   the RelaxNG file (you should not need this unless you are hacking 
+     *   Services_Twitter...).
      *
      * These options can be set either by passing them directly to the 
      * constructor as an array (3rd parameter), or by using the setOption() or 
@@ -132,15 +134,26 @@ class Services_Twitter
      * @see Services_Twitter::setOptions()
      */
     protected $options = array(
-        'timeout'   => 30,
-        'userAgent' => 'Services_Twitter @package_version@',
-        'test'      => false,
-        'source'    => null
+        'format'     => self::OUTPUT_JSON,
+        'raw_format' => false,
+        'source'     => 'PEAR Services_Twitter',
+        'validate'   => false,
     );
+
+    /**
+     * The HTTP_Request2 instance, you can customize the request if you want to 
+     * (proxy, auth etc...) with the get/setRequest() methods.
+     *
+     * @var HTTP_Request2 $request
+     * @see Services_Twitter::getRequest()
+     * @see Services_Twitter::setRequest()
+     */
+    protected $request = null;
 
     /**
      * The Twitter API mapping array, used internally to retrieve infos about 
      * the API categories, endpoints, parameters, etc...
+     *
      * The mapping is constructed with the api.xml file present in the 
      * Services_Twitter data directory.
      *
@@ -182,30 +195,8 @@ class Services_Twitter
                 $this->options[$option] = $value;
             }
         }
-
-        // initialize xml mapping
-        if (is_dir('@data_dir@')) {
-            $d = implode(DIRECTORY_SEPARATOR, 
-                array('@data_dir@', 'Services_Twitter', 'data'));
-        } else {
-            $d = implode(DIRECTORY_SEPARATOR,
-                array(dirname(__FILE__), '..', 'data'));
-        }
-        $d .= DIRECTORY_SEPARATOR;
-        if (isset($options['test']) && class_exists('DomDocument')) {
-            // this should be done only when testing
-            $doc = new DomDocument();
-            $doc->load($d . 'api.xml');
-            $doc->relaxNGValidate($d . 'api.rng');
-        }
-        $xmlApi = simplexml_load_file($d . 'api.xml');
-        foreach ($xmlApi->category as $category) {
-            $catName             = (string)$category['name'];
-            $this->api[$catName] = array();
-            foreach ($category->endpoint as $endpoint) {
-                $this->api[$catName][(string)$endpoint['name']] = $endpoint;
-            }
-        }
+        // set default request
+        $this->loadAPI();
     }
 
     // }}}
@@ -223,9 +214,6 @@ class Services_Twitter
     public function __get($property)
     {
         if ($this->currentCategory === null) {
-            if ($property == 'options') {
-                return $this->options;
-            }
             if (isset($this->api[$property])) {
                 $this->currentCategory = $property;
                 return $this;
@@ -272,12 +260,56 @@ class Services_Twitter
                 self::ERROR_ENDPOINT
             );
         }
+
+        // check that endpoint is available in the configured format
+        $formats = explode(',', (string)$ep->formats);
+        if (!in_array($this->options['format'], $formats)) {
+            throw new Services_Twitter_Exception(
+                'Endpoint ' . $endpoint . ' does not support '
+                . $this->options['format'] . ' format',
+                self::ERROR_ENDPOINT
+            );
+        }
+
         // we must reset the current category to null for future calls.
         $cat                   = $this->currentCategory;
         $this->currentCategory = null;
 
-        list($url, $params, $method) = $this->prepareRequest($ep, $args, $cat);
-        return $this->sendRequest($url, $params, $method);
+        list($uri, $method, $params, $files) = $this->prepareRequest($ep, $args, $cat);
+        // we can now send our request
+        $resp = $this->sendRequest($uri, $method, $params, $files);
+        $body = $resp->getBody();
+
+        // just return the raw response if needed
+        if ($this->options['raw_format']) {
+            return $body;
+        }
+
+        switch ($this->options['format']) {
+        case Services_Twitter::OUTPUT_JSON:
+            // XXX is there a way to catch json errors ?
+            $result = @json_decode($body);
+            // special case where the API returns true/false strings
+            $isbool = ($result == 'true' || $result == 'false');
+            break;
+        case Services_Twitter::OUTPUT_XML:
+            $result = @simplexml_load_string($body);
+            if (!$result instanceof SimpleXMLElement) {
+                throw new Services_Twitter_Exception(
+                    'Could not parse XML response received by the API', 
+                    Services_Twitter::ERROR_UNKNOWN,
+                    $uri,
+                    $res
+                );
+            }
+            $isbool = ((string)$result == 'true' || (string)$result == 'false');
+            break;
+        }
+        // special case where the API returns true/false strings
+        if ($isbool) {
+            return (string)$result == 'true';
+        }
+        return $result;
     }
 
     // }}}
@@ -307,6 +339,25 @@ class Services_Twitter
     }
 
     // }}}
+    // getOption() {{{
+
+    /**
+     * Get an option from {@link Services_Twitter::$options}
+     *
+     * @param string $option Name of option
+     *
+     * @return mixed
+     * @see Services_Twitter::$options
+     */
+    public function getOption($option)
+    {
+        if (isset($this->options[$option])) {
+            return $this->options[$option];
+        }
+        return null;
+    }
+
+    // }}}
     // setOptions() {{{
 
     /**
@@ -326,6 +377,86 @@ class Services_Twitter
     }
 
     // }}}
+    // getOptions() {{{
+
+    /**
+     * Return the Services_Twitter options array.
+     *
+     * @return array
+     * @see Services_Twitter::$options
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    // }}}
+    // getRequest() {{{
+    
+    /**
+     * Returns the HTTP_Request2 instance.
+     * 
+     * @return HTTP_Request2 The request
+     */
+    public function getRequest()
+    {
+        if ($this->request === null) {
+            $this->request = new HTTP_Request2();
+        }
+        return $this->request;
+    }
+    
+    // }}}
+    // setRequest() {{{
+    
+    /**
+     * Sets the HTTP_Request2 instance.
+     * 
+     * @param HTTP_Request2 $request The request to set
+     *
+     * @return void
+     */
+    public function setRequest(HTTP_Request2 $request)
+    {
+        $this->request = $request;
+    }
+    
+    // }}}
+    // loadAPI() {{{
+
+    /**
+     * Loads the XML API definition.
+     *
+     * @return void
+     */
+    protected function loadAPI()
+    {
+        // initialize xml mapping
+        if (is_dir('@data_dir@')) {
+            $d = implode(DIRECTORY_SEPARATOR, 
+                array('@data_dir@', 'Services_Twitter', 'data'));
+        } else {
+            $d = implode(DIRECTORY_SEPARATOR,
+                array(dirname(__FILE__), '..', 'data'));
+        }
+        $d .= DIRECTORY_SEPARATOR;
+        if ($this->options['validate'] && class_exists('DomDocument')) {
+            // this should be done only when testing
+            $doc = new DomDocument();
+            $doc->load($d . 'api.xml');
+            $doc->relaxNGValidate($d . 'api.rng');
+        }
+        $xmlApi = simplexml_load_file($d . 'api.xml');
+        foreach ($xmlApi->category as $category) {
+            $catName             = (string)$category['name'];
+            $this->api[$catName] = array();
+            foreach ($category->endpoint as $endpoint) {
+                $this->api[$catName][(string)$endpoint['name']] = $endpoint;
+            }
+        }
+    }
+
+    // }}}
     // prepareRequest() {{{
 
     /**
@@ -341,22 +472,40 @@ class Services_Twitter
     protected function prepareRequest($endpoint, array $args = array(), $cat = null)
     {
         $params = array();
+        $files  = array();
+        if (in_array((string)$endpoint['name'], array('search', 'trends'))) {
+            $uri = self::$searchUri;
+        } else {
+            $uri = self::$uri;
+        }
         $path   = '/';
         if ($cat !== null) {
             $path .= $cat . '/';
         }
-        $path  .= (string)$endpoint['name'];
-        $method = (string)$endpoint['method'];
+        $path .= (string)$endpoint['name'];
+        $uri  .= $path . '.' . $this->options['format'];
+        $method  = (string)$endpoint['method'];
         if ($method == 'POST' && $this->options['source'] !== null) {
             // we have a POST method and a registered source to pass
             $params['source'] = $this->options['source'];
         }
-        $xpath           = 'param[@required="true" or @required="1"]';
-        $hasRequiredArgs = count($endpoint->xpath($xpath));
-        if (!$hasRequiredArgs && (isset($args[0]) && !is_array($args[0]))) {
+        $xpath        = 'param[@required="true" or @required="1"]';
+        $requiredArgs = count($endpoint->xpath($xpath));
+        if (!$requiredArgs && (isset($args[0]) && !is_array($args[0]))) {
             throw new Services_Twitter_Exception(
                 $path . ' expects an array as unique parameter',
-                self::ERROR_PARAMS
+                self::ERROR_PARAMS,
+                $uri
+            );
+        }
+        $minargs = isset($endpoint['min_args']) ? 
+            (int)$endpoint['min_args'] : $requiredArgs;
+        if ($minargs && (!isset($args[0]) || 
+            is_array($args[0]) && $minargs > count($args[0]))) {
+            throw new Services_Twitter_Exception(
+                'Not enough arguments for ' . $path,
+                self::ERROR_PARAMS,
+                $uri
             );
         }
         foreach ($endpoint->param as $param) {
@@ -365,7 +514,7 @@ class Services_Twitter
             $pMaxLength = (int)$param['max_length'];
             $pMaxLength = $pMaxLength > 0 ? $pMaxLength : null;
             $pReq       = (string)$param['required'] == 'true';
-            if ($pReq) {
+            if ($pReq && !is_array($args[0])) {
                 $arg = array_shift($args);
             } else if (isset($args[0][$pName])) {
                 $arg = $args[0][$pName];
@@ -382,7 +531,8 @@ class Services_Twitter
             } catch (Exception $exc) {
                 throw new Services_Twitter_Exception(
                     $path . ': ' . $exc->getMessage(),
-                    self::ERROR_PARAMS
+                    self::ERROR_PARAMS,
+                    $uri
                 );
             }
             if ($pName == 'id') {
@@ -398,15 +548,76 @@ class Services_Twitter
                       | [\xF1-\xF3][\x80-\xBF]{3}          # planes 4-15
                       |  \xF4[\x80-\x8F][\x80-\xBF]{2}     # plane 16
                     )*$%xs', $arg)) {
-                    // we have an iso-8859-1 string
+                    // we have an iso-8859-1 string that we must convert to 
+                    // unicode
                     $arg = utf8_encode($arg);
                 }
-                $params[$pName] = $arg;
+                if ($pType == 'image') {
+                    // we have a file upload
+                    $files[$pName] = $arg;
+                } else {
+                    $params[$pName] = $arg;
+                }
             }
         }
+        return array($uri, $method, $params, $files);
+    }
 
-        $uri = self::$uri . $path . '.xml';
-        return array($uri, $params, $method);
+    // }}}
+    // sendRequest() {{{
+
+    /**
+     * Send a request to the Twitter API.
+     *
+     * @param string $uri    The full URI to the API endpoint
+     * @param array  $method The HTTP request method (GET or POST)
+     * @param array  $args   The API endpoint arguments if any
+     * @param array  $files  The API endpoint file uploads if any
+     *
+     * @throws Services_Twitter_Exception
+     * @return object Instance of SimpleXMLElement 
+     */
+    protected function sendRequest($uri, $method = 'GET', array $args = array(),
+        array $files = array())
+    {
+        try {
+            $request = clone $this->getRequest();
+            $request->setMethod($method);
+            if ($method == 'POST') {
+                foreach ($args as $key => $val) {
+                    $request->addPostParameter($key, $val);
+                }
+                foreach ($files as $key => $val) {
+                    $request->addUpload($key, $val);
+                }
+            } else {
+                $prefix = '?';
+                foreach ($args as $key => $val) {
+                    $uri   .= $prefix . $key . '=' . urlencode($val);
+                    $prefix = '&';
+                }
+            }
+            $request->setUrl($uri);
+            if ($this->user !== null && $this->pass !== null) {
+                $request->setAuth($this->user, $this->pass);
+            }
+            $response = $request->send();
+        } catch (HTTP_Request2_Exception $exc) {
+            throw new Services_Twitter_Exception(
+                $exc->getMessage(),
+                $exc, // the original exception cause
+                $uri
+            );
+        }
+        if ($response->getStatus() != 200) { // is this enought ?
+            throw new Services_Twitter_Exception(
+                $response->getReasonPhrase(),
+                $response->getStatus(),
+                $uri,
+                $response
+            );
+        }
+        return $response;
     }
 
     // }}}
@@ -485,90 +696,31 @@ class Services_Twitter
                      . implode(', ', $devices);
             }
             break;
+        case 'iso-639-1':
+            if (strlen($val) != 2) {
+                $msg = $name . ' must be a valid iso-639-1 language code';
+            }
+            break;
+        case 'geocode':
+            if (!preg_match('/^([-\d\.]+,){2}([-\d\.]+(km|mi)$)/', $val)) {
+                $msg = $name . ' must be "latitide,longitude,radius(km or mi)"';
+            }
+            break;
+        case 'color':
+            if (!preg_match('/^([0-9a-f]{1,2}){3}$/i', $val)) {
+                $msg = $name . ' must be an hexadecimal color code (eg. fff)';
+            }
+            break;
+        case 'image':
+            if (!file_exists($val) || !is_readable($val)) {
+                $msg = $name . ' must be a valid image path';
+            }
+            // XXX we don't check the image type for now...
+            break;
         }
         if ($msg !== null) {
             throw new Services_Twitter_Exception($msg, self::ERROR_PARAMS);
         }
-    }
-
-    // }}}
-    // sendRequest() {{{
-
-    /**
-     * Send a request to the Twitter API.
-     *
-     * @param string $uri    The full URI to the API endpoint
-     * @param array  $args   The API endpoint arguments to pass
-     * @param array  $method The HTTP request method (GET or POST)
-     *
-     * @throws Services_Twitter_Exception
-     * @return object Instance of SimpleXMLElement 
-     */
-    protected function sendRequest($uri, array $args = array(), $method = 'GET')
-    {
-        $sets = array();
-        foreach ($args as $key => $val) {
-            $sets[] = $key . '=' . urlencode($val);
-        }
-        if ($this->options['test']) {
-            return sprintf("%s\t%s\t%s\n", $method, $uri, implode('&', $sets));
-        }
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->options['userAgent']);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_USERPWD, $this->user . ':' . $this->pass);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->options['timeout']);
-
-        if ($method == 'POST') {
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, implode('&', $sets));
-        } else {
-            if (count($sets)) {
-                $uri .= '?' . implode('&', $sets);
-            }
-        }
-
-        curl_setopt($ch, CURLOPT_URL, $uri);
-        $res = trim(curl_exec($ch));
-
-        $err = curl_errno($ch);
-        if ($err !== CURLE_OK) {
-            throw new Services_Twitter_Exception(curl_error($ch), $err, $uri);
-        }
-
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if (substr($code, 0, 1) != '2') {
-            $xml = @simplexml_load_string($res);
-            if ($xml instanceof SimpleXMLElement && isset($xml->error)) {
-                throw new Services_Twitter_Exception(
-                    (string)$xml->error, $code, $uri
-                );
-            }
-            throw new Services_Twitter_Exception(
-                'Unexpected HTTP status returned from API',
-                Services_Twitter::ERROR_UNKNOWN, $uri
-            );
-        }
-
-        curl_close($ch);
-
-        if (!strlen($res)) {
-            throw new Services_Twitter_Exception(
-                'Empty response was received from API', 
-                Services_Twitter::ERROR_UNKNOWN, $uri
-            );
-        }
-
-        $xml = @simplexml_load_string($res);
-        if (!$xml instanceof SimpleXMLElement) {
-            throw new Services_Twitter_Exception(
-                'Could not parse response received from API', 
-                Services_Twitter::ERROR_UNKNOWN, $uri, $res
-            );
-        }
-
-        return $xml;
     }
 
     // }}}

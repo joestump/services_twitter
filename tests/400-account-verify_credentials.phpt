@@ -1,26 +1,18 @@
 --TEST--
-account-verify_credentials
+account-verify_credencials
 --FILE--
 <?php
 
-require_once dirname(__FILE__) . '/tests.inc.php';
-require_once 'Services/Twitter.php';
+require_once dirname(__FILE__) . '/setup.php';
 
-$twitter = new Services_Twitter($user, $pass, array('test' => true));
-echo $twitter->account->verify_credentials();
-
-// this allows for testing live against the service, or locally
-if (isset($live) && $live == true) {
-    // live test that must evaluate to bool(true)
-    $twitter = new Services_Twitter($user, $pass);
-    $res     = $twitter->account->verify_credentials();
-    var_dump((string)$res === 'true');
-} else {
-    var_dump(true);
+try {
+    $twitter = Services_Twitter_factory('account/verify_credentials');
+    $user    = $twitter->account->verify_credentials();
+    var_dump($user instanceof stdclass && isset($user->id));
+} catch (Services_Twitter_Exception $exc) {
+    echo $exc . "\n";
 }
-    
 
 ?>
 --EXPECT--
-GET	http://twitter.com/account/verify_credentials.xml	
 bool(true)

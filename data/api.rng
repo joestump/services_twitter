@@ -61,6 +61,10 @@
                                         <value>email</value>
                                         <value>id_or_screenname</value>
                                         <value>device</value>
+                                        <value>iso-639-1</value>
+                                        <value>geocode</value>
+                                        <value>image</value>
+                                        <value>color</value>
                                     </choice>
                                 </attribute>
                                 <attribute name="required">

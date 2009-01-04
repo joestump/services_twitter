@@ -159,8 +159,32 @@ http://pear.php.net/packages/Services_Twitter
             <formats>xml,json</formats>
             <param name="device" type="device" required="true"/>
         </endpoint>
+        <endpoint name="update_profile_colors" method="POST" auth_required="true" min_args="1">
+            <formats>xml,json</formats>
+            <param name="profile_background_color" type="color" required="false"/>
+            <param name="profile_text_color" type="color" required="false"/>
+            <param name="profile_link_color" type="color" required="false"/>
+            <param name="profile_sidebar_fill_color" type="color" required="false"/>
+            <param name="profile_sidebar_border_color" type="color" required="false"/>
+        </endpoint>
+        <endpoint name="update_profile_image" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="image" type="image" required="true"/>
+        </endpoint>
+        <endpoint name="update_profile_background_image" method="POST" auth_required="true">
+            <formats>xml,json</formats>
+            <param name="image" type="image" required="true"/>
+        </endpoint>
         <endpoint name="rate_limit_status" method="GET" auth_required="true">
             <formats>xml,json</formats>
+        </endpoint>
+        <endpoint name="update_profile" method="POST" auth_required="true" min_args="1">
+            <formats>xml,json</formats>
+            <param name="name" type="string" max_length="40" required="false"/>
+            <param name="email" type="string" max_length="40" required="false"/>
+            <param name="url" type="string" max_length="100" required="false"/>
+            <param name="location" type="string" max_length="30" required="false"/>
+            <param name="description" type="string" max_length="160" required="false"/>
         </endpoint>
     </category>
 
@@ -224,6 +248,25 @@ http://pear.php.net/packages/Services_Twitter
         </endpoint>
         <endpoint name="downtime_schedule" method="GET" auth_required="false">
             <formats>xml,json</formats>
+        </endpoint>
+    </category>
+
+    <!--
+    Search API methods, documentation available at:
+    -->
+    <category name="search">
+        <endpoint name="search" method="GET" auth_required="false">
+            <formats>json,atom</formats>
+            <param name="q" type="string" required="true"/>
+            <param name="rpp" type="integer" required="false"/>
+            <param name="lang" type="iso-639-1" required="false"/>
+            <param name="page" type="integer" required="false"/>
+            <param name="since_id" type="integer" required="false"/>
+            <param name="geocode" type="geocode" required="false"/>
+            <param name="show_user" type="boolean" required="false"/>
+        </endpoint>
+        <endpoint name="trends" method="GET" auth_required="false">
+            <formats>json</formats>
         </endpoint>
     </category>
 

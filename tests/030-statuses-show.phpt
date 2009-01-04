@@ -1,36 +1,18 @@
 --TEST--
 statuses-show
---SKIPIF--
-<?php
-
-require_once dirname(__FILE__) . '/tests.inc.php';
-
-if (!isset($statusID) || !$statusID) {
-    echo 'skip $statusID is not set properly';
-}
-
-?>
 --FILE--
 <?php
 
-require_once dirname(__FILE__) . '/tests.inc.php';
-require_once 'Services/Twitter.php';
+require_once dirname(__FILE__) . '/setup.php';
 
-$twitter = new Services_Twitter($user, $pass, array('test' => true));
-echo $twitter->statuses->show(100000);
-
-// this allows for testing live against the service, or locally
-if (isset($live) && $live == true) {
-    // live test that must evaluate to bool(true)
-    $twitter = new Services_Twitter($user, $pass);
-    $res     = $twitter->statuses->show($statusID);
-    var_dump((int)$res->id == $statusID);
-} else {
-    var_dump(true);
+try {
+    $twitter = Services_Twitter_factory('statuses/show');
+    $status  = $twitter->statuses->show($config['status_id']);
+    var_dump($status instanceof stdclass && isset($status->id));
+} catch (Services_Twitter_Exception $exc) {
+    echo $exc . "\n";
 }
-    
 
 ?>
 --EXPECT--
-GET	http://twitter.com/statuses/show/100000.xml	
 bool(true)
