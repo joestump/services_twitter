@@ -275,7 +275,10 @@ class Services_Twitter
         $cat                   = $this->currentCategory;
         $this->currentCategory = null;
 
-        list($uri, $method, $params, $files) = $this->prepareRequest($ep, $args, $cat);
+        // prepare the request
+        list($uri, $method, $params, $files) = 
+            $this->prepareRequest($ep, $args, $cat);
+
         // we can now send our request
         $resp = $this->sendRequest($uri, $method, $params, $files);
         $body = $resp->getBody();
@@ -478,13 +481,13 @@ class Services_Twitter
         } else {
             $uri = self::$uri;
         }
-        $path   = '/';
+        $path = '/';
         if ($cat !== null) {
             $path .= $cat . '/';
         }
-        $path .= (string)$endpoint['name'];
-        $uri  .= $path . '.' . $this->options['format'];
-        $method  = (string)$endpoint['method'];
+        $method = (string)$endpoint['method'];
+        $path  .= (string)$endpoint['name'];
+        $uri   .= $path . '.' . $this->options['format'];
         if ($method == 'POST' && $this->options['source'] !== null) {
             // we have a POST method and a registered source to pass
             $params['source'] = $this->options['source'];

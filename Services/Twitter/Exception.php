@@ -29,6 +29,8 @@ require_once 'PEAR/Exception.php';
  * @author   Joe Stump <joe@joestump.net> 
  * @author   David Jean Louis <izimobil@gmail.com> 
  * @license  http://www.opensource.org/licenses/bsd-license.php New BSD License
+ * @link     http://twitter.com
+ * @link     http://apiwiki.twitter.com
  */
 class Services_Twitter_Exception extends PEAR_Exception
 {

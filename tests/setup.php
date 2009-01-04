@@ -27,7 +27,7 @@ require_once 'HTTP/Request2/Response.php';
 require_once 'HTTP/Request2/Adapter/Mock.php';
 
 $cfgfile = dirname(__FILE__) . '/tests-config.php';
-if (false === @include_once($cfgfile)) {
+if (false === @include_once $cfgfile) {
     // default config
     $config = array(
         'user'      => 'test_user',
