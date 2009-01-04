@@ -265,6 +265,8 @@ http://pear.php.net/packages/Services_Twitter
             <param name="geocode" type="geocode" required="false"/>
             <param name="show_user" type="boolean" required="false"/>
         </endpoint>
+    </category>
+    <category name="trends">
         <endpoint name="trends" method="GET" auth_required="false">
             <formats>json</formats>
         </endpoint>
