@@ -24,25 +24,28 @@
         <email>izi@php.net</email>
         <active>yes</active>
     </lead>
-    <date>2008-09-27</date>
+    <date>2009-01-05</date>
     <version>
-        <release>0.2.0</release>
-        <api>0.2.0</api>
+        <release>0.3.0</release>
+        <api>0.3.0</api>
     </version>
     <stability>
         <release>beta</release>
         <api>beta</api>
     </stability>
     <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
-    <notes><![CDATA[
-* removed endpoints code in favor of a xml definition and generic methods;
-* support new API additions (fixes bug #) and removed deprecated methods;
-* support a "source" option (fixes bug #);
-* better validation of parameters;
-* improved/fixed tests and added the possibility to run tests locally (without
-  calling the live service);
-* cosmetic CS changes (removed licence in source code, added vim folds etc...);
-    ]]></notes>
+    <notes>
+<![CDATA[
+* removed endpoints code in favor of a xml definition and generic methods [izi];
+* better validation of parameters [izi];
+* update API changes and add the new API methods (update_account, update_background_image etc...) [izi];
+* switch to JSON format as default (XML is still available) [izi]
+* switch to HTTP_Request2 [izi];
+* make the test suite runnable locally with mock HTTP responses and improved code coverage (near 100%) [izi]; 
+* cosmetic CS changes (removed licence in source code, added vim folds etc...) [izi];
+* fixed bugs #15072 #15084 #15085 #15358 and #15472 [izi].
+]]>
+    </notes>
     <contents>
         <dir name="/">
             <dir name="Services">
@@ -65,39 +68,89 @@
                 <file name="010-statuses-friends_timeline.phpt" role="test"/>
                 <file name="020-statuses-user_timeline.phpt" role="test"/>
                 <file name="030-statuses-show.phpt" role="test"/>
-                <file name="040-statuses-update.phpt" role="test"/>
+                <file name="040-statuses-update-destroy.phpt" role="test"/>
                 <file name="050-statuses-replies.phpt" role="test"/>
-                <file name="060-statuses-destroy.phpt" role="test"/>
-                <file name="070-statuses-friends.phpt" role="test"/>
-                <file name="080-statuses-followers.phpt" role="test"/>
+                <file name="060-statuses-friends.phpt" role="test"/>
+                <file name="070-statuses-followers.phpt" role="test"/>
                 <file name="100-users-show.phpt" role="test"/>
                 <file name="200-direct_messages.phpt" role="test"/>
                 <file name="210-direct_messages-sent.phpt" role="test"/>
-                <file name="220-direct_messages-new.phpt" role="test"/>
-                <file name="230-direct_messages-destroy.phpt" role="test"/>
-                <file name="300-friendships-create.phpt" role="test"/>
-                <file name="310-friendships-destroy.phpt" role="test"/>
-                <file name="320-friendships-exists.phpt" role="test"/>
+                <file name="220-direct_messages-new-destroy.phpt" role="test"/>
+                <file name="300-friendships-create-destroy.phpt" role="test"/>
+                <file name="310-friendships-exists.phpt" role="test"/>
                 <file name="400-account-verify_credentials.phpt" role="test"/>
                 <file name="410-account-end_session.phpt" role="test"/>
                 <file name="420-account-update_location.phpt" role="test"/>
                 <file name="430-account-update_delivery_device.phpt" role="test"/>
                 <file name="440-account-rate_limit_status.phpt" role="test"/>
                 <file name="500-favorites.phpt" role="test"/>
-                <file name="510-favorites-create.phpt" role="test"/>
-                <file name="520-favorites-destroy.phpt" role="test"/>
-                <file name="600-notifications-follow.phpt" role="test"/>
-                <file name="610-notifications-leave.phpt" role="test"/>
-                <file name="700-blocks-create.phpt" role="test"/>
-                <file name="710-blocks-destroy.phpt" role="test"/>
+                <file name="510-favorites-create-destroy.phpt" role="test"/>
+                <file name="600-notifications-follow-leave.phpt" role="test"/>
+                <file name="700-blocks-create-destroy.phpt" role="test"/>
                 <file name="800-help-test.phpt" role="test"/>
                 <file name="810-help-downtime_schedule.phpt" role="test"/>
-                <file name="services-twitter-exceptions.phpt" role="test" /> 
-                <file name="services-twitter-options.phpt" role="test" /> 
-                <file name="services-twitter-validation.phpt" role="test" /> 
-                <file name="AllTests.php" role="test" /> 
-                <file name="tests-config.php.example" role="test" /> 
-                <file name="tests.inc.php" role="test" /> 
+                <file name="900-exceptions.phpt" role="test"/>
+                <file name="910-options.phpt" role="test"/>
+                <file name="920-utf8.phpt" role="test"/>
+                <file name="930-validation.phpt" role="test"/>
+                <file name="AllTests.php" role="test">
+                    <tasks:replace from="@package_version@" to="version" type="package-info" />
+                </file>
+                <file name="setup.php" role="test"/>
+                <file name="tests-config.php.example" role="test"/>
+                <dir name="data">
+                    <file name="options.dat" role="test" />
+                    <file name="pear-power.gif" role="test" />
+                    <file name="utf8.dat" role="test" />
+                    <dir name="statuses">
+                        <file name="destroy.dat" role="test"/>
+                        <file name="followers.dat" role="test"/>
+                        <file name="friends.dat" role="test"/>
+                        <file name="friends_timeline.dat" role="test"/>
+                        <file name="public_timeline.dat" role="test"/>
+                        <file name="replies.dat" role="test"/>
+                        <file name="show.dat" role="test"/>
+                        <file name="update.dat" role="test"/>
+                        <file name="user_timeline.dat" role="test"/>
+                    </dir>
+                    <dir name="users">
+                        <file name="show.dat" role="test"/>
+                    </dir>
+                    <dir name="direct_messages">
+                        <file name="destroy_new.dat" role="test"/>
+                        <file name="direct_messages.dat" role="test"/>
+                        <file name="sent.dat" role="test"/>
+                    </dir>
+                    <dir name="friendships">
+                        <file name="create_destroy.dat" role="test"/>
+                        <file name="exists1.dat" role="test"/>
+                        <file name="exists2.dat" role="test"/>
+                        <file name="exists3.dat" role="test"/>
+                        <file name="exists4.dat" role="test"/>
+                    </dir>
+                    <dir name="account">
+                        <file name="end_session.dat" role="test"/>
+                        <file name="rate_limit_status.dat" role="test"/>
+                        <file name="update_delivery_device.dat" role="test"/>
+                        <file name="update_location.dat" role="test"/>
+                        <file name="verify_credentials.dat" role="test"/>
+                    </dir>
+                    <dir name="help">
+                        <file name="downtime_schedule.dat" role="test"/>
+                        <file name="test.dat" role="test"/>
+                    </dir>
+                    <dir name="blocks">
+                        <file name="create_destroy.dat" role="test"/>
+                    </dir>
+                    <dir name="notifications">
+                        <file name="follow_leave.dat" role="test"/>
+                    </dir>
+                    <dir name="favorites">
+                        <file name="create.dat" role="test"/>
+                        <file name="destroy.dat" role="test"/>
+                        <file name="favorites.dat" role="test"/>
+                    </dir>
+                </dir>
             </dir>
         </dir>
     </contents>
@@ -178,9 +231,37 @@
                 <api>beta</api>
             </stability>
             <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
-            <notes><![CDATA[
+            <notes>
+<![CDATA[
 * Initial public release.
-            ]]></notes>
+]]>
+            </notes>
+        </release>
+        <release>
+
+            <date>2008-11-01</date>
+            <version>
+                <release>0.2.0</release>
+                <api>0.2.0</api>
+            </version>
+            <stability>
+                <release>beta</release>
+                <api>beta</api>
+            </stability>
+            <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
+            <notes>
+<![CDATA[
+* Fixed a bug in the Services_Twitter_Account::end_session() method (jstump)
+* Fixed a singleton problem that only allowed a single instance to ever run (#14840, izi)
+* Added ability to specify an in_reply_to_status_id when sending an update (#14714, jstump)
+* Added ability to specify a source using setOption('source', $source) that is sent with all requests (#14715, jstump)
+* Added ability to retrieve someone else's followers (#14936, davidc)
+* Added Services_Twitter_Account::update_location() method (jstump)
+* Added Services_Twitter_Account::update_delivery_device() method (jstump)
+* Added Services_Twitter_Search::trends() method (jstump)
+* Added Services_Twitter_Search::query() method (jstump)
+]]>
+            </notes>
         </release>
     </changelog>
 </package>
