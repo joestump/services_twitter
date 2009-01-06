@@ -1,5 +1,15 @@
 --TEST--
 direct-messages-new-destroy
+--SKIPIF--
+<?php
+
+require_once dirname(__FILE__) . '/setup.php';
+$twitter = Services_Twitter_factory('direct_messages/destroy_new');
+if ($config['live_test'] && !$twitter->friendships->exists($config['user'], $config['friend'])) {
+    echo "skip {$config['friend']} is not a friend !";
+}
+
+?>
 --FILE--
 <?php
 

@@ -83,6 +83,10 @@
                 <file name="420-account-update_location.phpt" role="test"/>
                 <file name="430-account-update_delivery_device.phpt" role="test"/>
                 <file name="440-account-rate_limit_status.phpt" role="test"/>
+                <file name="460-account-update_profile_image.phpt" role="test"/>
+                <file name="470-account-update_profile_background_image.phpt" role="test"/>
+                <file name="480-account-update_profile.phpt" role="test"/>
+                <file name="450-account-update_profile_colors.phpt" role="test"/>
                 <file name="500-favorites.phpt" role="test"/>
                 <file name="510-favorites-create-destroy.phpt" role="test"/>
                 <file name="600-notifications-follow-leave.phpt" role="test"/>
@@ -99,8 +103,9 @@
                 <file name="setup.php" role="test"/>
                 <file name="tests-config.php.example" role="test"/>
                 <dir name="data">
+                    <file name="background.jpg" role="test" />
                     <file name="options.dat" role="test" />
-                    <file name="pear-power.gif" role="test" />
+                    <file name="profile.png" role="test" />
                     <file name="utf8.dat" role="test" />
                     <dir name="statuses">
                         <file name="destroy.dat" role="test"/>
@@ -133,6 +138,10 @@
                         <file name="rate_limit_status.dat" role="test"/>
                         <file name="update_delivery_device.dat" role="test"/>
                         <file name="update_location.dat" role="test"/>
+                        <file name="update_profile.dat" role="test"/>
+                        <file name="update_profile_colors.dat" role="test"/>
+                        <file name="update_profile_background_image.dat" role="test"/>
+                        <file name="update_profile_image.dat" role="test"/>
                         <file name="verify_credentials.dat" role="test"/>
                     </dir>
                     <dir name="help">

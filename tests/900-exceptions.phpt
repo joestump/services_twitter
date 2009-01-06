@@ -59,7 +59,7 @@ Unsupported endpoint nonendpoint
 Unsupported endpoint statuses/foo
 Unsupported endpoint statuses
 /statuses/friends_timeline expects an array as unique parameter
-Not enough arguments for /statuses/update (code: 3, call: http://twitter.com/statuses/update.json)
+Not enough arguments for /statuses/update (code: 3, call: /statuses/update)
 Not enough arguments for /statuses/update
-http://twitter.com/statuses/update.json
+/statuses/update
 Endpoint public_timeline does not support foo format
