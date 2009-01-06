@@ -487,7 +487,6 @@ class Services_Twitter
         }
         $method = (string)$endpoint['method'];
         $path  .= (string)$endpoint['name'];
-        $uri   .= $path . '.' . $this->options['format'];
         if ($method == 'POST' && $this->options['source'] !== null) {
             // we have a POST method and a registered source to pass
             $params['source'] = $this->options['source'];
@@ -498,7 +497,7 @@ class Services_Twitter
             throw new Services_Twitter_Exception(
                 $path . ' expects an array as unique parameter',
                 self::ERROR_PARAMS,
-                $uri
+                $path
             );
         }
         $minargs = isset($endpoint['min_args']) ? 
@@ -508,7 +507,7 @@ class Services_Twitter
             throw new Services_Twitter_Exception(
                 'Not enough arguments for ' . $path,
                 self::ERROR_PARAMS,
-                $uri
+                $path
             );
         }
         foreach ($endpoint->param as $param) {
@@ -535,7 +534,7 @@ class Services_Twitter
                 throw new Services_Twitter_Exception(
                     $path . ': ' . $exc->getMessage(),
                     self::ERROR_PARAMS,
-                    $uri
+                    $path
                 );
             }
             if ($pName == 'id') {
@@ -563,6 +562,7 @@ class Services_Twitter
                 }
             }
         }
+        $uri .= $path . '.' . $this->options['format'];
         return array($uri, $method, $params, $files);
     }
 
