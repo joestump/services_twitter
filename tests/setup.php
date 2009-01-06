@@ -60,10 +60,16 @@ function Services_Twitter_factory($ep, $auth = true, $options = array())
     }
     
     if (!$config['live_test']) {
-        // build a mock response and set the adapter
-        $resp = new HTTP_Request2_Response('HTTP/1.1 200 Success', false);
-        $file = dirname(__FILE__) . '/data/' . $ep . '.dat';
-        $resp->appendBody(file_get_contents($file));
+        if ($ep == 'exception1') {
+            $resp = new HTTP_Request2_Response('HTTP/1.1 401 Unauthorized', false);
+            $resp->appendBody('{"request":"\/statuses\/friends_timeline.json","error":"Could not authenticate you."}');
+        } else if ($ep == 'exception2') {
+            $resp = new HTTP_Request2_Response('HTTP/1.1 404 Not Found', false);
+        } else {
+            $resp = new HTTP_Request2_Response('HTTP/1.1 200 Success', false);
+            $file = dirname(__FILE__) . '/data/' . $ep . '.dat';
+            $resp->appendBody(file_get_contents($file));
+        }
         $mock = new HTTP_Request2_Adapter_Mock();
         $mock->addResponse($resp);
         $request = $twitter->getRequest()->setAdapter($mock);

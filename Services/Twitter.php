@@ -283,36 +283,26 @@ class Services_Twitter
         $resp = $this->sendRequest($uri, $method, $params, $files);
         $body = $resp->getBody();
 
-        // just return the raw response if needed
+        // check for errors
+        if (substr($resp->getStatus(), 0, 1) != '2') {
+            $error = $this->decodeBody($body);
+            if (isset($error->error)) {
+                $message = (string) $error->error;
+            } else {
+                $message = $resp->getReasonPhrase();
+            }
+            throw new Services_Twitter_Exception(
+                $message,
+                $resp->getStatus(),
+                $uri,
+                $resp
+            );
+        }
+
         if ($this->options['raw_format']) {
             return $body;
         }
-
-        switch ($this->options['format']) {
-        case Services_Twitter::OUTPUT_JSON:
-            // XXX is there a way to catch json errors ?
-            $result = @json_decode($body);
-            // special case where the API returns true/false strings
-            $isbool = ($result == 'true' || $result == 'false');
-            break;
-        case Services_Twitter::OUTPUT_XML:
-            $result = @simplexml_load_string($body);
-            if (!$result instanceof SimpleXMLElement) {
-                throw new Services_Twitter_Exception(
-                    'Could not parse XML response received by the API', 
-                    Services_Twitter::ERROR_UNKNOWN,
-                    $uri,
-                    $res
-                );
-            }
-            $isbool = ((string)$result == 'true' || (string)$result == 'false');
-            break;
-        }
-        // special case where the API returns true/false strings
-        if ($isbool) {
-            return (string)$result == 'true';
-        }
-        return $result;
+        return $this->decodeBody($body);
     }
 
     // }}}
@@ -425,6 +415,36 @@ class Services_Twitter
     }
     
     // }}}
+    // decodeBody() {{{
+
+    /**
+     * Decode the response body according to the configured format.
+     *
+     * @param string $body The response body to decode
+     *
+     * @return mixed
+     */
+    protected function decodeBody($body)
+    {
+
+        switch ($this->options['format']) {
+        case Services_Twitter::OUTPUT_JSON:
+            $result = json_decode($body);
+            $isbool = ($result == 'true' || $result == 'false');
+            break;
+        case Services_Twitter::OUTPUT_XML:
+            $result = simplexml_load_string($body);
+            $isbool = ((string)$result == 'true' || (string)$result == 'false');
+            break;
+        }
+        // special case where the API returns true/false strings
+        if ($isbool) {
+            return (string)$result == 'true';
+        }
+        return $result;
+    }
+
+    // }}}
     // loadAPI() {{{
 
     /**
@@ -529,7 +549,7 @@ class Services_Twitter
                 continue;
             }
             try {
-                $this->validateArg($pName, $arg, $pReq, $pType, $pMaxLength);
+                $this->validateArg($pName, $arg, $pType, $pMaxLength);
             } catch (Exception $exc) {
                 throw new Services_Twitter_Exception(
                     $path . ': ' . $exc->getMessage(),
@@ -612,14 +632,6 @@ class Services_Twitter
                 $uri
             );
         }
-        if ($response->getStatus() != 200) { // is this enought ?
-            throw new Services_Twitter_Exception(
-                $response->getReasonPhrase(),
-                $response->getStatus(),
-                $uri,
-                $response
-            );
-        }
         return $response;
     }
 
@@ -631,22 +643,14 @@ class Services_Twitter
      *
      * @param array $name      The argument name
      * @param array &$val      The argument value, passed by reference
-     * @param bool  $req       Whether the argument is required or not
      * @param array $type      The argument type
      * @param array $maxLength The argument maximum length (optional)
      *
      * @throws Services_Twitter_Exception
      * @return void
      */
-    protected function validateArg($name, &$val, $req, $type, $maxLength = null)
+    protected function validateArg($name, &$val, $type, $maxLength = null)
     {
-        // check if required arg
-        if ($req && $val === null) {
-            throw new Services_Twitter_Exception(
-                $name . ' is required', self::ERROR_PARAMS
-            );
-        }
-
         // check length if necessary
         if ($maxLength !== null && strlen($val) > $maxLength) {
             throw new Exception(

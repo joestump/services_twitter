@@ -112,16 +112,11 @@ class Services_Twitter_Exception extends PEAR_Exception
      */
     public function __toString()
     {
-        $ret = '%s (%s)';
-        if ($this->code instanceof Exception) {
-            $info = $this->code->getMessage();
-        } else {
-            $info = 'code: ' . $this->code;
-        }
+        $info = 'code: ' . $this->code;
         if ($this->call !== null) {
             $info .= ', call: ' . $this->call;
         }
-        return sprintf($ret, $this->message, $info);
+        return sprintf('%s (%s)', $this->message, $info);
     }
 
     // }}}
