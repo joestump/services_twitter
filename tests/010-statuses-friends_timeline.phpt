@@ -13,7 +13,7 @@ try {
         'count'    => 5,
         'page'     => 1
     ));
-    var_dump(count($timeline) == 5);
+    var_dump(is_array($timeline));
 } catch (Services_Twitter_Exception $exc) {
     echo $exc . "\n";
 }

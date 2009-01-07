@@ -11,8 +11,7 @@ try {
         'id'     => $config['user'],
         'count'  => 5,
     ));
-    //fwrite(fopen('tests/data/statuses/user_timeline.dat', 'w'), $timeline);
-    var_dump(count($timeline) == 5);
+    var_dump(is_array($timeline));
 } catch (Services_Twitter_Exception $exc) {
     echo $exc . "\n";
 }
