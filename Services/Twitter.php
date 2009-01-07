@@ -136,7 +136,7 @@ class Services_Twitter
     protected $options = array(
         'format'     => self::OUTPUT_JSON,
         'raw_format' => false,
-        'source'     => 'PEAR Services_Twitter',
+        'source'     => 'pearservicestwitter',
         'validate'   => false,
     );
 

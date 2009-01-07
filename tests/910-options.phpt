@@ -40,7 +40,6 @@ require_once dirname(__FILE__) . '/setup.php';
 $twitter = Services_Twitter_factory('options', true, array(
     'format'     => 'xml',
     'raw_format' => 'true',
-    'source'     => 'PEAR Services_Twitter',
 ));
 $status = $twitter->statuses->update('foo');
 echo $status;
@@ -64,6 +63,6 @@ Foo
 <?xml version="1.0" encoding="UTF-8"?>
 <status>
   %s
-  <source>web</source>
+  <source>&lt;a href=&quot;http://pear.php.net/package/Services_Twitter&quot;&gt;PEAR Services_Twitter&lt;/a&gt;</source>
   %s
 </status>

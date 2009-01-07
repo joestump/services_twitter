@@ -3,7 +3,7 @@
   <created_at>Sun Jan 04 20:01:00 +0000 2009</created_at>
   <id>1095645467</id>
   <text>foo</text>
-  <source>web</source>
+  <source>&lt;a href=&quot;http://pear.php.net/package/Services_Twitter&quot;&gt;PEAR Services_Twitter&lt;/a&gt;</source>
   <truncated>false</truncated>
   <in_reply_to_status_id></in_reply_to_status_id>
   <in_reply_to_user_id></in_reply_to_user_id>
