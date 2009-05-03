@@ -97,9 +97,10 @@ class Services_Twitter_Search extends Services_Twitter_Common
      * @return object The results of the query according to the API
      * @see Services_Twitter_Search::sendRequest()
      */
-    public function query($query)
+    public function query($query, array $params = array())
     {
-        return $this->sendRequest('/search', array('q' => $query));
+        $params['q'] = $query; 
+        return $this->sendRequest('/search', $params);
     }
 
     /**
